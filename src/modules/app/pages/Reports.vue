@@ -10,7 +10,7 @@
       <apexchart type="pie" width="450" :options="chartOptionsDocs" :series="seriesDocs"></apexchart>
     </div>
     <q-table class="my-sticky-virtscroll-table q-mt-xs" virtual-scroll flat bordered title="Estadísticas por Usuarios"
-      :rows="sortedData" :columns="columns" :virtual-scroll-sticky-size-start="48" row-key="id"
+      :rows="data" :columns="columns" :virtual-scroll-sticky-size-start="48" row-key="id"
       v-model:pagination.sync="pagination" :rows-per-page-options="[10, 20, 30, 50]"
       :rows-per-page-label="'Registros por página'" :filter="filter" :no-data-label="'No hay datos disponibles'"
       :no-results-label="'No se encontraron registros'">
@@ -504,6 +504,7 @@ export default defineComponent({
       filter,
       columns,
       sortedData,
+      data,
       dateFilter,
       dateClosePopup,
       filterData,
