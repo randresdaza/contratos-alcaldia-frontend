@@ -1,7 +1,7 @@
 <template>
   <q-layout view="hHh lpR fFf">
     <div class="container">
-      <img src="src/assets/login.jpg" alt="Plaza Alfonso Lopez">
+      <img src="~assets/login.jpg" alt="Plaza Alfonso Lopez">
     </div>
     <q-page-container>
       <router-view />

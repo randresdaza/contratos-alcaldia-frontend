@@ -12,8 +12,6 @@
     <q-separator />
   </div>
 
-
-
   <div style="background-color:gray;">
     <q-bar class="bg-grey-10 text-white q-pl-md q-pt-lg q-pb-lg q-pr-md">
       <q-field dark borderless class="text-h7 col col-xs-4 col-sm-4 col-md-4" stack-label>

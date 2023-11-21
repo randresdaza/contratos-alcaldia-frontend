@@ -6,8 +6,11 @@
       <ChartUsersContracts />
     </div> -->
     <div class="row justify-center q-mt-xs">
-      <apexchart type="pie" width="450" :options="chartOptionsContracts" :series="seriesContracts"></apexchart>
-      <apexchart type="pie" width="450" :options="chartOptionsDocs" :series="seriesDocs"></apexchart>
+      <apexchart v-if="validateDataContracts != 0" type="pie" width="450" :options="chartOptionsContracts"
+        :series="seriesContracts">
+      </apexchart>
+      <apexchart v-if="validateDataDocs != 0" type="pie" width="450" :options="chartOptionsDocs" :series="seriesDocs">
+      </apexchart>
     </div>
     <q-table class="my-sticky-virtscroll-table q-mt-xs" virtual-scroll flat bordered title="Estadísticas por Usuarios"
       :rows="data" :columns="columns" :virtual-scroll-sticky-size-start="48" row-key="id"
@@ -420,6 +423,22 @@ export default defineComponent({
       return [...data.value].sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
     })
 
+    const validateDataContracts = computed(() => {
+      let sum = 0;
+      seriesContracts.value.forEach(e => {
+        sum += e
+      })
+      return sum
+    })
+
+    const validateDataDocs = computed(() => {
+      let sum = 0;
+      seriesDocs.value.forEach(e => {
+        sum += e
+      })
+      return sum
+    })
+
     const filterData = async () => {
       if (dateFilter.value.to > today.value) {
         Swal.fire(
@@ -509,6 +528,8 @@ export default defineComponent({
       dateClosePopup,
       filterData,
       clearFilter,
+      validateDataContracts,
+      validateDataDocs,
       from,
       to,
       oneDay,
