@@ -52,12 +52,10 @@
       <q-btn round class="q-mr-xs" color="grey-10" icon="las la-search-plus" @click="zoomIn">
         <q-tooltip class="bg-white text-black">Ampliar</q-tooltip>
       </q-btn>
-      <q-btn v-if="true" round class="q-mr-xs" color="grey-10" icon="las la-download" @click="onDownload">
+      <q-btn v-if="download == 'Activadas'" round class="q-mr-xs" color="grey-10" icon="las la-download"
+        @click="onDownload">
         <q-tooltip class="bg-white text-black">Descargar</q-tooltip>
       </q-btn>
-      <!-- <q-btn round color="grey-10" icon="las la-print" @click="onPrint">
-      <q-tooltip class="bg-white text-black">Imprimir</q-tooltip>
-    </q-btn> -->
     </q-bar>
     <div class="flex flex-center q-pt-xs q-pb-xs">
       <canvas class="pdf-container" ref="pdfViewer" @contextmenu="preventContextMenu"></canvas>
@@ -66,17 +64,14 @@
 </template>
 
 <script>
-import { ref, onMounted, watch, computed, onBeforeMount } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
 import { api } from 'src/boot/axios';
 import Swal from 'sweetalert2';
 import { useRouter } from 'vue-router';
 import useAuth from 'src/modules/auth/composables/useAuth';
-import uploadFile from 'src/modules/app/helpers/uploadFile';
-import moment from 'moment-timezone';
 import CryptoJS from 'crypto-js';
 import * as pdfjsLib from 'pdfjs-dist/build/pdf.js';
-import { PDFViewer } from "pdfjs-dist/web/pdf_viewer";
 import 'pdfjs-dist/web/pdf_viewer.css'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc =
@@ -86,19 +81,16 @@ export default {
   props: ['idDoc', 'file'],
   setup(props) {
     const $q = useQuasar()
-
     const router = useRouter()
-
-    const fileUrl = ref('')
-
+    const fileName = ref('')
     const pdfViewer = ref(null)
-
     const pdfPages = ref()
     const currentPage = ref(1)
     const numPage = ref(1)
     const scale = ref(1)
-
     const pdfName = ref()
+    const { username } = useAuth()
+    const download = ref('')
 
     const onBack = () => {
       router.push({ name: 'docs' })
@@ -148,58 +140,68 @@ export default {
       }
     }
 
-    const onDownload = () => {
-      // window.open(fileUrl.value, '_blank')
-      console.log('DESCARGANDO');
-      const link = document.createElement('a');
-      link.href = `https://res.cloudinary.com/drl3mxyh4/image/upload/fl_attachment/v1/files/${pdfName.value}`;
-      // link.download = 'nombre-del-archivo.pdf';
-      link.click();
-    }
+    const onDownload = async () => {
+      try {
+        const response = await api.get(`/files/?fileName=${fileName.value}`, {
+          responseType: 'arraybuffer'
+        })
+        const blob = new Blob([response.data], { type: 'application/pdf' })
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
 
-    const onPrint = () => {
-      window.print()
+        link.href = url;
+        link.setAttribute('download', fileName.value);
+        link.click();
+
+        window.URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error('Error al descargar el archivo:', error);
+      }
     }
 
     const decodeUrl = async () => {
       const claveSecreta = 'yEoKdfOAnPsMeU7YorhFGSbliDMclou8'
       const fileEncriptado = props.file
       const fileDesencriptado = await CryptoJS.AES.decrypt(fileEncriptado, claveSecreta).toString(CryptoJS.enc.Utf8)
-      fileUrl.value = fileDesencriptado
+      fileName.value = fileDesencriptado
     }
 
     const loadAndDisplayPdf = async () => {
+      $q.loading.show({
+        message: 'Cargando...'
+      })
       try {
-        const pdfData = await fetch(fileUrl.value);
-        const pdfArrayBuffer = await pdfData.arrayBuffer();
-        const pdfDoc = await pdfjsLib.getDocument({ data: pdfArrayBuffer }).promise;
-        pdfPages.value = pdfDoc.numPages;
-        const pdfPage = await pdfDoc.getPage(Number(numPage.value));
-        const canvas = pdfViewer.value;
-        const context = canvas.getContext('2d');
-        const viewport = pdfPage.getViewport({ scale: scale.value });
+        const pdfData = await api.get(`/files/?fileName=${fileName.value}`, {
+          responseType: 'arraybuffer'
+        });
+        const pdfArrayBuffer = pdfData.data
+        const pdfDoc = await pdfjsLib.getDocument({ data: pdfArrayBuffer, verbosity: 0 }).promise
+        pdfPages.value = pdfDoc.numPages
+        const pdfPage = await pdfDoc.getPage(Number(numPage.value))
+        const canvas = pdfViewer.value
+        const context = canvas.getContext('2d')
+        const viewport = pdfPage.getViewport({ scale: scale.value })
+        const outputScale = window.devicePixelRatio || 1
 
-        const outputScale = window.devicePixelRatio || 1;
-
-        canvas.width = Math.floor(viewport.width * outputScale);
-        canvas.height = Math.floor(viewport.height * outputScale);
-        canvas.style.width = Math.floor(viewport.width) + "px";
-        canvas.style.height = Math.floor(viewport.height) + "px";
+        canvas.width = Math.floor(viewport.width * outputScale)
+        canvas.height = Math.floor(viewport.height * outputScale)
+        canvas.style.width = Math.floor(viewport.width) + "px"
+        canvas.style.height = Math.floor(viewport.height) + "px"
 
         const transform = outputScale !== 1
           ? [outputScale, 0, 0, outputScale, 0, 0]
-          : null;
+          : null
 
         const renderContext = {
           canvasContext: context,
           transform: transform,
           viewport: viewport
-        };
-
-        await pdfPage.render(renderContext).promise;
+        }
+        await pdfPage.render(renderContext).promise
       } catch (error) {
-        console.error('Error al cargar y mostrar el PDF', error);
+        console.error('Error al cargar y mostrar el PDF', error)
       }
+      $q.loading.hide()
     }
 
     const getData = async () => {
@@ -227,8 +229,33 @@ export default {
         })
     }
 
+    const getDataUser = async () => {
+      await api.get(`/users/username/${username.value}/`)
+        .then(result => {
+          download.value = result.data.descargas
+        })
+        .catch(e => {
+          console.log(e);
+          if (e.response.status == 401) {
+            Swal.fire(
+              {
+                html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
+                icon: 'info'
+              }
+            ).then((result) => {
+              if (result.isConfirmed) {
+                router.push({ name: 'login' })
+              } else {
+                router.push({ name: 'login' })
+              }
+            })
+          }
+        })
+    }
+
     onMounted(async () => {
       await getData()
+      await getDataUser()
       await decodeUrl()
       await loadAndDisplayPdf()
     })
@@ -243,9 +270,9 @@ export default {
       zoomOut,
       zoomIn,
       onDownload,
-      onPrint,
       pdfViewer,
       pdfName,
+      download,
 
       preventContextMenu(event) {
         event.preventDefault();

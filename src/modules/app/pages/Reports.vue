@@ -1,15 +1,11 @@
 <template>
-  <div class="q-pa-md">
+  <div class="q-pa-lg">
     <!-- <span class="text-h5 row justify-center q-mt-xs">Estadísticas por Usuarios</span> -->
-    <!-- <div class="row justify-center q-mt-xs">
-      <ChartUsersDocs />
-      <ChartUsersContracts />
-    </div> -->
-    <div class="row justify-center q-mt-xs">
-      <apexchart v-if="validateDataContracts != 0" type="pie" width="450" :options="chartOptionsContracts"
+    <div class="row justify-center">
+      <apexchart v-if="validateDataContracts != 0" type="pie" width="440" :options="chartOptionsContracts"
         :series="seriesContracts">
       </apexchart>
-      <apexchart v-if="validateDataDocs != 0" type="pie" width="450" :options="chartOptionsDocs" :series="seriesDocs">
+      <apexchart v-if="validateDataDocs != 0" type="pie" width="440" :options="chartOptionsDocs" :series="seriesDocs">
       </apexchart>
     </div>
     <q-table class="my-sticky-virtscroll-table q-mt-xs" virtual-scroll flat bordered title="Estadísticas por Usuarios"
@@ -62,29 +58,22 @@
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import VueApexCharts from "vue3-apexcharts";
 import { useQuasar } from 'quasar'
-import ChartUsersDocs from 'src/modules/app/components/ChartUsersDocs.vue';
-import ChartUsersContracts from 'src/modules/app/components/ChartUsersContracts.vue';
 import { api } from 'src/boot/axios';
 import Swal from 'sweetalert2';
-
 
 export default defineComponent({
   name: 'Reports',
   components: {
     apexchart: VueApexCharts,
-    // ChartUsersDocs,
-    // ChartUsersContracts
   },
   setup() {
     const $q = useQuasar()
-
     const chartOptionsContracts = ref({})
     const seriesContracts = ref([])
     const chartOptionsDocs = ref({})
     const seriesDocs = ref([])
     const dataUsers = ref([])
     const usernames = ref([])
-
     const pagination = ref({})
     const filter = ref('')
     const data = ref([])
@@ -96,14 +85,12 @@ export default defineComponent({
     const monthFormat = month.toString().padStart(2, '0')
     const fromDate = `${year}/${monthFormat}/${dayFormat}`
     const toDate = `${year}/${monthFormat}/${dayFormat}`
-
     const dateFilter = ref({ from: fromDate, to: toDate })
     const from = ref('')
     const to = ref('')
     const oneDay = ref('')
     const today = ref(fromDate)
     const dateClosePopup = ref(Boolean)
-
 
     const columns = [
       { name: 'fecha', align: 'left', label: 'FECHA', field: 'fecha', sortable: true },
@@ -160,7 +147,7 @@ export default defineComponent({
       usernames.value = [...new Set(names)]
       chartOptionsContracts.value = {
         chart: {
-          width: 450,
+          width: 440,
           type: 'pie',
         },
         labels: usernames.value,
@@ -183,7 +170,7 @@ export default defineComponent({
       }
       chartOptionsDocs.value = {
         chart: {
-          width: 450,
+          width: 440,
           type: 'pie',
         },
         labels: usernames.value,
@@ -267,7 +254,7 @@ export default defineComponent({
         usernames.value = [...new Set(names)]
         chartOptionsContracts.value = {
           chart: {
-            width: 450,
+            width: 440,
             type: 'pie',
           },
           labels: usernames.value,
@@ -290,7 +277,7 @@ export default defineComponent({
         }
         chartOptionsDocs.value = {
           chart: {
-            width: 450,
+            width: 440,
             type: 'pie',
           },
           labels: usernames.value,
@@ -371,7 +358,7 @@ export default defineComponent({
         usernames.value = [...new Set(names)]
         chartOptionsContracts.value = {
           chart: {
-            width: 450,
+            width: 440,
             type: 'pie',
           },
           labels: usernames.value,
@@ -394,7 +381,7 @@ export default defineComponent({
         }
         chartOptionsDocs.value = {
           chart: {
-            width: 450,
+            width: 440,
             type: 'pie',
           },
           labels: usernames.value,
@@ -536,7 +523,6 @@ export default defineComponent({
       today,
       show,
       hide,
-
       seriesContracts,
       chartOptionsContracts,
       seriesDocs,

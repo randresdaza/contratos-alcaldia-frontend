@@ -24,8 +24,6 @@
             <div>Salir</div>
           </q-btn>
         </div>
-
-
       </q-toolbar>
     </q-header>
 
@@ -42,9 +40,7 @@
         <q-item-label header>
           Navegación
         </q-item-label>
-
         <EssentialLink v-for="link in linksList" :key="link.title" v-bind="link" />
-
       </q-list>
     </q-drawer>
 
@@ -61,30 +57,22 @@ import { linksListAdmin } from 'src/modules/app/router/link-list-admin';
 import { linksListDig } from 'src/modules/app/router/link-list-dig';
 import { linksListSup } from 'src/modules/app/router/link-list-sup';
 import { useRouter } from 'vue-router';
-
 import useAuth from 'src/modules/auth/composables/useAuth';
 import useUI from 'src/modules/app/composables/useUI';
 import { api } from 'src/boot/axios';
 
-
 export default defineComponent({
   name: 'MainLayout',
-
   components: {
     EssentialLink
   },
-
   setup() {
     // const leftDrawerOpen = ref(false)
     const router = useRouter()
     const { username, logout } = useAuth()
-
     const { sideMenuOpen, toggleSideMenu } = useUI()
-
     const data = ref([])
-
     const rol = ref([])
-
     const linksList = ref([])
 
     const getData = async () => {
@@ -120,8 +108,8 @@ export default defineComponent({
       sideMenuOpen,
       toggleSideMenu,
       rol,
-
       username,
+
       onLogout: () => {
         router.push({ name: 'login' })
         rol.value = []

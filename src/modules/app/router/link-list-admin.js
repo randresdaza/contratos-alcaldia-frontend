@@ -53,5 +53,4 @@ export const linksListAdmin = [
     icon: 'las la-chart-bar',
     link: 'reports'
   },
-
 ]

@@ -9,9 +9,8 @@
 </template>
 
 <script>
-import useAuth from './modules/auth/composables/useAuth';
-
 import { defineComponent } from 'vue'
+import useAuth from './modules/auth/composables/useAuth';
 
 export default defineComponent({
   name: 'App',

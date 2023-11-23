@@ -1,12 +1,12 @@
 <template>
-  <div class="q-pa-md">
+  <div class="q-pa-lg">
     <q-form @submit="addData">
       <div class="row items-center">
-        <q-input class="q-mb-md q-pt-md q-pb-md" style="width: 300px;max-width: 80vw; max-height: 80vw;" filled
-          v-model="formData.nombre" label="Nombre de la Serie" type="text" lazy-rules
+        <q-input class="" style="width: 300px;max-width: 80vw; max-height: 80vw;" filled v-model="formData.nombre"
+          label="Nombre de la Serie" type="text" lazy-rules
           :rules="[val => val && val.length > 0 || 'Este campo es obligatorio']" />
-        <q-btn push class="q-mb-md q-ml-md q-pt-md q-pb-md" color="secondary" icon-right="las la-save" label="Guardar"
-          type="submit" />
+        <q-btn push class="q-mb-lg q-mt-xs q-ml-md q-pt-md q-pb-md" color="secondary" icon-right="las la-save"
+          label="Guardar" type="submit" />
       </div>
     </q-form>
 
@@ -69,16 +69,12 @@ import { api } from 'src/boot/axios';
 import Swal from 'sweetalert2';
 import { useRouter } from 'vue-router';
 
-
 export default {
   setup() {
     const router = useRouter()
-
     const pagination = ref({})
     const filter = ref('')
-
     const modal = ref(false)
-
     const data = ref([])
 
     const formData = ref({
@@ -231,10 +227,8 @@ export default {
       columns,
       data,
       modal,
-
       formData,
       editData,
-
       addData,
       updateData,
       onEdit,
@@ -244,7 +238,6 @@ export default {
   }
 }
 </script>
-
 
 <style lang="sass" scoped>
 .center

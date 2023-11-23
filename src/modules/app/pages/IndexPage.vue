@@ -5,18 +5,16 @@
 </template>
 
 <script>
-import { defineComponent, ref } from 'vue'
+import { defineComponent } from 'vue'
 import useAuth from 'src/modules/auth/composables/useAuth';
 import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
-
 
 export default defineComponent({
   name: 'IndexPage',
   setup() {
     const { logout, checkAuthStatus } = useAuth()
     const router = useRouter()
-
     const resp = checkAuthStatus()
 
     resp.then((resp) => {
@@ -39,6 +37,7 @@ export default defineComponent({
   }
 })
 </script>
+
 <style scoped>
 .responsive-image {
   max-width: 100%;

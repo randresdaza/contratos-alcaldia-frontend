@@ -30,20 +30,16 @@
 
 <script>
 import { defineComponent, ref } from 'vue'
-import { useQuasar } from 'quasar'
 import { useRouter } from 'vue-router';
 import useAuth from '../composables/useAuth';
-
+import { useQuasar } from 'quasar'
 import Swal from 'sweetalert2';
-
 
 export default defineComponent({
   name: 'Login',
   setup() {
-
     const router = useRouter()
     const { loginUser } = useAuth()
-
     const $q = useQuasar()
 
     const userForm = ref({
@@ -67,7 +63,6 @@ export default defineComponent({
           return
         }
         const { ok, message } = await loginUser(userForm.value)
-
         if (!ok) {
           Swal.fire('Error', message, 'error')
         }

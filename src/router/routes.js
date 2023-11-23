@@ -2,7 +2,6 @@ import authRouter from '../modules/auth/router';
 import isAuthenticatedGuard from 'src/modules/auth/router/auth-guard';
 import appRouter from '../modules/app/router';
 
-
 const routes = [
   {
     path: '/',

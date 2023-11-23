@@ -1,9 +1,7 @@
 import { computed } from "vue"
 import { useStore } from "vuex"
 
-
 const useAuth = () => {
-
   const store = useStore()
 
   const createUser = async (user) => {
@@ -23,8 +21,6 @@ const useAuth = () => {
 
   const logout = () => {
     store.commit('auth/logout')
-    // store.commit('journal/clearEntries')
-    // limpiar las entradas
   }
 
   return {

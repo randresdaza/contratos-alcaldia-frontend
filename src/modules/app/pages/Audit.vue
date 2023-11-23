@@ -1,7 +1,6 @@
 <template>
   <div class="q-pa-lg">
-
-    <q-table class="my-sticky-virtscroll-table q-mt-xs" virtual-scroll flat bordered title="Históricos por Usuario"
+    <q-table class="my-sticky-virtscroll-table" virtual-scroll flat bordered title="Históricos por Usuario"
       :rows="sortedData" :columns="columns" :virtual-scroll-sticky-size-start="48" row-key="id"
       v-model:pagination.sync="pagination" :rows-per-page-options="[10, 20, 30, 50]"
       :rows-per-page-label="'Registros por página'" :filter="filter" :no-data-label="'No hay datos disponibles'"
@@ -33,13 +32,9 @@
 <script>
 import { ref, onMounted, computed } from 'vue'
 import { api } from 'src/boot/axios';
-import { useQuasar } from 'quasar'
-
 
 export default {
   setup() {
-    const $q = useQuasar()
-
     const pagination = ref({})
     const filter = ref('')
     const data = ref([])
@@ -54,7 +49,6 @@ export default {
       { name: 'contrato', align: 'left', label: 'CONTRATO', field: row => row.contrato.asunto },
       { name: 'documento', align: 'left', label: 'DOCUMENTO', field: row => row.documento.nombre },
       // { name: 'contrato_documento', align: 'left', label: 'CONTRATO ASOCIADO', field: row => row.documento.contrato.asunto },
-
     ]
 
     const getData = async () => {
@@ -64,18 +58,13 @@ export default {
           for (let i = 0; i < data.value.length; i++) {
             let fecha = new Date(data.value[i].fecha);
             fecha.setHours(fecha.getHours());
-
-            // Formatear la fecha a tu formato deseado
             let año = fecha.getFullYear();
             let mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
             let dia = fecha.getDate().toString().padStart(2, '0');
             let hora = fecha.getHours().toString().padStart(2, '0');
             let minuto = fecha.getMinutes().toString().padStart(2, '0');
             let segundo = fecha.getSeconds().toString().padStart(2, '0');
-
-            // Crear la cadena de fecha en tu formato deseado
             let dateFormat = `${año}-${mes}-${dia} ${hora}:${minuto}:${segundo}`;
-
             data.value[i].fecha = dateFormat;
           }
         })
@@ -109,7 +98,6 @@ export default {
       pagination,
       filter,
       columns,
-
       sortedData
     }
   },

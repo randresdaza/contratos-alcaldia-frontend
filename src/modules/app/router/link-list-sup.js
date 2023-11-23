@@ -41,5 +41,4 @@ export const linksListSup = [
     icon: 'las la-chart-bar',
     link: 'reports'
   },
-
 ]

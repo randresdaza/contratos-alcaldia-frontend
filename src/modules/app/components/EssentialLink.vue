@@ -16,7 +16,6 @@ import { defineComponent } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex';
 
-
 export default defineComponent({
   name: 'EssentialLink',
   props: {
@@ -24,17 +23,14 @@ export default defineComponent({
       type: String,
       required: true
     },
-
     caption: {
       type: String,
       default: ''
     },
-
     link: {
       type: String,
       default: '#'
     },
-
     icon: {
       type: String,
       default: ''
@@ -42,11 +38,8 @@ export default defineComponent({
   },
 
   setup(props) {
-
     const store = useStore()
-
     const router = useRouter()
-
 
     return {
       navigateTo() {

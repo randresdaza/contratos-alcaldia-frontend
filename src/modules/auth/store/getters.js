@@ -1,8 +1,3 @@
-
-// export const myGetter = (state) => {
-// return state
-// }
-
 export const currentState = (state) => {
   return state.status
 }
@@ -10,4 +5,3 @@ export const currentState = (state) => {
 export const username = (state) => {
   return state.user
 }
-

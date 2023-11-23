@@ -20,8 +20,9 @@
           <q-td key="username">{{ props.row.username }}</q-td>
           <q-td key="name">{{ props.row.name }}</q-td>
           <q-td key="email">{{ props.row.email }}</q-td>
-          <q-td key="estado">{{ props.row.estado }}</q-td>
           <q-td key="rol">{{ props.row.rol.nombre }}</q-td>
+          <q-td key="estado">{{ props.row.estado }}</q-td>
+          <q-td key="descargas">{{ props.row.descargas }}</q-td>
           <q-td class="center" key="actions">
             <q-btn push class="q-mr-xs" icon="las la-pencil-alt" color="amber" label="Editar" stack glossy
               @click="onEdit(props.row)"></q-btn>
@@ -58,10 +59,13 @@
             <q-input v-if="!edit" filled v-model="checkPassword" type="password" label="Confirmar contraseña" lazy-rules
               :rules="[val => val && val.length > 0 || 'Este campo es obligatorio', isSamePassword]" />
 
+            <q-select filled v-model="formData.rol" :options="rols" label="Rol" option-label="nombre"
+              :rules="[val => !!val || 'Este campo es obligatorio']" />
+
             <q-select v-if="edit" filled v-model="formData.estado" :options="status" label="Estado"
               :rules="[val => !!val || 'Este campo es obligatorio']" />
 
-            <q-select filled v-model="formData.rol" :options="rols" label="Rol" option-label="nombre"
+            <q-select v-if="edit" filled v-model="formData.descargas" :options="downloads" label="Descargas"
               :rules="[val => !!val || 'Este campo es obligatorio']" />
 
             <div class="row justify-center">
@@ -86,24 +90,17 @@ import { api } from 'src/boot/axios';
 import Swal from 'sweetalert2';
 import { useRouter } from 'vue-router';
 
-
 export default {
   setup() {
     const router = useRouter()
-
     const pagination = ref({})
     const filter = ref('')
-
     const data = ref([])
-
     const modal = ref(false)
     const edit = ref(false)
-
     const card = ref(false)
     const cardHeight = ref('')
-
     const checkPassword = ref('')
-
     const rols = ref([])
 
     const formData = ref({
@@ -113,6 +110,7 @@ export default {
       name: '',
       email: '',
       estado: '',
+      descargas: '',
       rol: '',
     })
 
@@ -121,8 +119,9 @@ export default {
       { name: 'username', align: 'left', label: 'USUARIO', field: 'username' },
       { name: 'nombre', align: 'left', label: 'NOMBRE', field: 'name' },
       { name: 'email', align: 'left', label: 'CORREO', field: 'email' },
-      { name: 'estado', align: 'left', label: 'ESTADO', field: 'estado', sortable: true },
       { name: 'rol', align: 'left', label: 'ROL', field: row => row.rol.nombre },
+      { name: 'estado', align: 'left', label: 'ESTADO', field: 'estado', sortable: true },
+      { name: 'descargas', align: 'left', label: 'DESCARGAS', field: 'descargas', sortable: true },
       { name: 'actions', align: 'right', label: 'ACCIONES' }
     ]
 
@@ -191,6 +190,7 @@ export default {
         name: formData.value.name,
         email: formData.value.email,
         estado: formData.value.estado,
+        descargas: formData.value.descargas,
         rol: formData.value.rol.id
       }
       await api.put(`/users/${formData.value.id}/`, dataToSave)
@@ -223,13 +223,14 @@ export default {
       modal.value = true
       edit.value = true
       card.value = true
-      cardHeight.value = '620px'
+      // cardHeight.value = '700px'
       formData.value = {
         id: data.id,
         username: data.username,
         name: data.name,
         email: data.email,
         estado: data.estado,
+        descargas: data.descargas,
         rol: data.rol.nombre
       }
     }
@@ -309,29 +310,27 @@ export default {
       pagination,
       filter,
       columns,
-
       data,
       modal,
       edit,
       card,
       cardHeight,
-
       onNew,
       onEdit,
       onDelete,
       formData,
       checkPassword,
-
       rols,
-
       addData,
       updateData,
-
       onSubmit,
       onReset,
 
       status: [
         'Activo', 'Inactivo'
+      ],
+      downloads: [
+        'Activadas', 'Desactivadas'
       ],
       isValidEmail(val) {
         const emailPattern = /^(?=[a-zA-Z0-9@._%+-]{6,254}$)[a-zA-Z0-9._%+-]{1,64}@(?:[a-zA-Z0-9-]{1,63}\.){1,8}[a-zA-Z]{2,63}$/;

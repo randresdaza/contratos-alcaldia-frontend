@@ -76,7 +76,7 @@
                   <div v-if="!file">
                     Solo se permiten archivos .pdf
                     <div class="row justify-end">
-                      Tamaño máximo por archivo: 1 MB
+                      Tamaño máximo por archivo: 5 MB
                     </div>
                   </div>
                 </template>
@@ -106,29 +106,20 @@ import Swal from 'sweetalert2';
 import { useRouter } from 'vue-router';
 import useAuth from 'src/modules/auth/composables/useAuth';
 import uploadFile from 'src/modules/app/helpers/uploadFile';
-import moment from 'moment-timezone';
-
 
 export default {
   setup() {
     const $q = useQuasar()
     const router = useRouter()
-
     const { username } = useAuth()
-
     const pagination = ref({})
     const filter = ref('')
-
     const data = ref([])
     const dataUser = ref([])
-
     const modalDoc = ref(false)
-
     const file = ref(null)
     const fileSize = ref(Number)
-
     const nDocs = ref('')
-
     const isDocValid = ref(Boolean)
 
     const formData = ref({
@@ -290,7 +281,6 @@ export default {
     }
 
     const updateContract = async () => {
-      console.log('NDOCS', nDocs.value);
       const contractToSave = {
         asunto: formData.value.asunto,
         fecha_inicial: formData.value.fecha_inicial,
@@ -306,7 +296,6 @@ export default {
         subserie: formData.value.subserie.id,
         usuario: dataUser.value.id
       }
-      console.log("Data to save UPDATE CONTRACT", contractToSave);
       await api.put(`/contratos/${formData.value.id}/`, contractToSave)
         .then(result => {
           getData()
@@ -327,7 +316,6 @@ export default {
         .then(result => {
           const data = result.data
           nDocs.value = data.length
-          console.log('NDOCS ANTES UPDATE', nDocs.value);
           updateContract()
         })
         .catch(e => {
@@ -351,7 +339,7 @@ export default {
     const validateDocSize = async () => {
       let size = 0;
       for (let i = 0; i < file.value.length; i++) {
-        if (file.value[i].size <= 1100000) {
+        if (file.value[i].size <= 5500000) {
           isDocValid.value = true
           size += file.value[i].size
         } else {
@@ -361,7 +349,7 @@ export default {
             {
               icon: 'error',
               title: 'Error',
-              html: `El archivo ${file.value[i].name} supera el tamaño máximo permitido (1 MB).<br><br>Tamaño: ${(file.value[i].size / 1048576).toFixed(2)} MB`,
+              html: `El archivo ${file.value[i].name} supera el tamaño máximo permitido (5 MB).<br><br>Tamaño del archivo: ${(file.value[i].size / 1048576).toFixed(2)} MB`,
             }
           )
           break
@@ -372,31 +360,38 @@ export default {
 
     const addDocument = async () => {
       let exist = false
+      let date = new Date();
       $q.loading.show({
         message: 'Subiendo archivos. Por favor espere...',
         boxClass: 'bg-grey-2 text-grey-9',
         spinnerColor: 'primary'
       })
       const resp = await uploadFile(file.value)
-      console.log(resp);
       for (let i = 0; i < resp.length; i++) {
-        let fullDate = resp[i].created_at
-        let dateFormat = moment.tz(fullDate, 'YYYY-MM-DDTHH:mm:ss[Z]', 'UTC')
-        let date = dateFormat.format('YYYY-MM-DD HH:mm:ss')
+        let day = date.getDate()
+        let month = date.getMonth() + 1
+        let year = date.getFullYear()
+        let hours = date.getHours()
+        let minutes = date.getMinutes()
+        let seconds = date.getSeconds()
+        let dayFormat = day.toString().padStart(2, '0')
+        let monthFormat = month.toString().padStart(2, '0')
+        let hoursFormat = hours.toString().padStart(2, '0')
+        let minutesFormat = minutes.toString().padStart(2, '0')
+        let secondsFormat = seconds.toString().padStart(2, '0')
+        let dateTime = `${year}-${monthFormat}-${dayFormat} ${hoursFormat}:${minutesFormat}:${secondsFormat}`
         if (!resp[i].existing) {
           let name = file.value[i].name.split('.')[0]
           let dataToSave = {
             nombre: name,
-            fecha_creacion: date,
+            fecha_creacion: dateTime,
             nro_paginas: resp[i].pages,
-            file: resp[i].secure_url,
             contrato: formData.value.id,
             usuario: dataUser.value.id
           }
-          console.log('Data to Save: ', dataToSave);
           await api.post('/documentos/', dataToSave)
             .then(result => {
-              console.log('Guardado: ', i);
+
             })
             .catch(e => {
               modalDoc.value = false
@@ -431,8 +426,6 @@ export default {
       } else {
         Swal.fire('Guardado', 'Registrado con éxito.', 'success')
       }
-
-
     }
 
     const onReset = () => {
@@ -464,10 +457,8 @@ export default {
       pagination,
       filter,
       columns,
-
       data,
       modalDoc,
-
       onNew,
       onView,
       onAddDocument,
@@ -475,18 +466,14 @@ export default {
       onEdit,
       onDelete,
       formData,
-
       file,
       fileSize,
-
       addDocument,
-
       onReset,
     }
   }
 }
 </script>
-
 
 <style lang="sass" scoped>
 .center

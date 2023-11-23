@@ -2,11 +2,10 @@
   <div class="q-pa-lg" style="display: flex; align-items: center; justify-content: center; flex-direction: column;">
     <q-form @submit="addData">
       <div class="row items-center">
-        <q-select class="q-mb-md q-pt-md q-pb-md" style="width: 200px;max-width: 80vw; max-height: 80vw;" filled
-          v-model="formData.nombre" :options="roles" label="Seleccionar Rol"
-          :rules="[val => !!val || 'Este campo es obligatorio']" />
-        <q-btn push class="q-mb-md q-ml-md q-pt-md q-pb-md" color="secondary" icon-right="las la-save" label="Guardar"
-          type="submit" />
+        <q-select style="width: 200px;max-width: 80vw; max-height: 80vw;" filled v-model="formData.nombre"
+          :options="roles" label="Seleccionar Rol" :rules="[val => !!val || 'Este campo es obligatorio']" />
+        <q-btn push class="q-mb-lg q-mt-xs q-ml-md q-pt-md q-pb-md" color="secondary" icon-right="las la-save"
+          label="Guardar" type="submit" />
       </div>
     </q-form>
 

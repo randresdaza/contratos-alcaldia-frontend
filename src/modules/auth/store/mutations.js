@@ -1,9 +1,3 @@
-
-
-// export const myAction = (state) => {
-
-// }
-
 export const loginUser = (state, { username, access, refresh }) => {
   if (access) {
     localStorage.setItem('access', access)

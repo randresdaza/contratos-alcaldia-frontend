@@ -157,7 +157,6 @@ export default {
 
     const getDataToEdit = async () => {
       if (edit.value) {
-        console.log(edit.value);
         await api.get(`/contratos/${props.id}/`)
           .then(result => {
             formData.value = result.data;
