@@ -106,27 +106,19 @@ export default {
   setup(props) {
     const { username } = useAuth()
     const router = useRouter()
-
     const date = new Date()
     const day = date.getDate()
     const month = date.getMonth() + 1
     const year = date.getFullYear()
     const dayFormat = day.toString().padStart(2, '0')
     const monthFormat = month.toString().padStart(2, '0')
-
     const fullDate = `${year}-${monthFormat}-${dayFormat}`
-
     const dateClosePopup = ref(Boolean)
-
     const dependencies = ref([])
     const series = ref([])
     const subseries = ref([])
-
     const edit = ref(false)
-    const data = ref([])
-
     const dataUser = ref([])
-
 
     const formData = ref({
       id: '',
@@ -254,7 +246,9 @@ export default {
         dependencia: formData.value.dependencia.id,
         serie: formData.value.serie.id,
         subserie: formData.value.subserie.id,
+        usuario: dataUser.value.id
       }
+      console.log('Data to Update: ', dataToSave);
       await api.put(`/contratos/${props.id}/`, dataToSave)
         .then(result => {
           Swal.fire('Guardado', 'Actualizado con éxito.', 'success')
@@ -365,8 +359,8 @@ export default {
 
 
     onMounted(() => {
-      getDataUser(),
-        validateEdit(),
+      validateEdit(),
+        getDataUser(),
         getDataToEdit(),
         getDependencies(),
         getSeries(),
