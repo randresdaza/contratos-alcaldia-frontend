@@ -155,7 +155,7 @@ export default {
 
         window.URL.revokeObjectURL(url);
       } catch (error) {
-        console.error('Error al descargar el archivo:', error);
+        //console.error('Error al descargar el archivo:', error);
       }
     }
 
@@ -199,7 +199,7 @@ export default {
         }
         await pdfPage.render(renderContext).promise
       } catch (error) {
-        console.error('Error al cargar y mostrar el PDF', error)
+        //console.error('Error al cargar y mostrar el PDF', error)
       }
       $q.loading.hide()
     }
@@ -211,7 +211,6 @@ export default {
           pdfName.value = name.split('.')[0]
         })
         .catch(e => {
-          console.log(e);
           if (e.response.status == 401) {
             Swal.fire(
               {
@@ -235,7 +234,6 @@ export default {
           download.value = result.data.descargas
         })
         .catch(e => {
-          console.log(e);
           if (e.response.status == 401) {
             Swal.fire(
               {

@@ -77,7 +77,6 @@ export default {
           }
         })
         .catch(e => {
-          console.log(e);
           if (e.response.status == 401) {
             Swal.fire(
               {

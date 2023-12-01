@@ -154,7 +154,7 @@ export default {
           rols.value = result.data
         })
         .catch(e => {
-          // console.log(e)
+
         })
     }
 
@@ -179,7 +179,6 @@ export default {
             'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
             'error',
           )
-          console.log(e)
         })
     }
 
@@ -201,7 +200,6 @@ export default {
         })
         .catch(e => {
           modal.value = false
-          console.log(e)
           Swal.fire(
             'Error',
             'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
@@ -258,7 +256,6 @@ export default {
               getData()
             })
             .catch(e => {
-              console.log(e)
               Swal.fire(
                 'Error',
                 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
@@ -284,10 +281,6 @@ export default {
         rol: ''
       }
       checkPassword.value = ''
-    }
-
-    const onSubmit = () => {
-      console.log(formData.value);
     }
 
     const sortedData = computed(() => {
@@ -323,7 +316,6 @@ export default {
       rols,
       addData,
       updateData,
-      onSubmit,
       onReset,
 
       status: [

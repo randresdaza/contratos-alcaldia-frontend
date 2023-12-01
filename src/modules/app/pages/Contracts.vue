@@ -184,7 +184,7 @@ export default {
           dataUser.value = result.data;
         })
         .catch(e => {
-          console.log(e)
+
         })
     }
 
@@ -246,7 +246,6 @@ export default {
               getData()
             })
             .catch(e => {
-              console.log(e)
               if (e.response.status == 401) {
                 Swal.fire(
                   {
@@ -307,7 +306,6 @@ export default {
             'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
             'error',
           )
-          console.log(e)
         })
     }
 
@@ -409,7 +407,6 @@ export default {
                   }
                 })
               }
-              console.log(e)
             })
         } else {
           exist = true

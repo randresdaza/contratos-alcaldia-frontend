@@ -90,7 +90,6 @@ export default {
           getData()
         })
         .catch(e => {
-          console.log(e.response.status)
           if (e.response.status == 400) {
             Swal.fire(
               {
@@ -132,7 +131,6 @@ export default {
               getData()
             })
             .catch(e => {
-              console.log(e)
               Swal.fire(
                 'Error',
                 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',

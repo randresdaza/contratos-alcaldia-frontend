@@ -100,7 +100,6 @@ import { api } from 'boot/axios';
 import Swal from 'sweetalert2';
 import useAuth from 'src/modules/auth/composables/useAuth';
 
-
 export default {
   props: ['id'],
   setup(props) {
@@ -143,7 +142,7 @@ export default {
           dataUser.value = result.data;
         })
         .catch(e => {
-          console.log(e)
+
         })
     }
 
@@ -187,7 +186,6 @@ export default {
         subserie: formData.value.subserie.id,
         usuario: dataUser.value.id
       }
-      console.log('Data to save:', dataToSave);
       await api.post('/contratos/', dataToSave)
         .then(result => {
           Swal.fire({
@@ -207,7 +205,6 @@ export default {
           })
         })
         .catch(e => {
-          console.log(e)
           if (e.response.status == 400) {
             Swal.fire(
               {
@@ -248,7 +245,6 @@ export default {
         subserie: formData.value.subserie.id,
         usuario: dataUser.value.id
       }
-      console.log('Data to Update: ', dataToSave);
       await api.put(`/contratos/${props.id}/`, dataToSave)
         .then(result => {
           Swal.fire('Guardado', 'Actualizado con éxito.', 'success')
@@ -318,7 +314,7 @@ export default {
           series.value = result.data
         })
         .catch(e => {
-          // console.log(e)
+
         })
     }
 
@@ -328,7 +324,7 @@ export default {
           subseries.value = result.data
         })
         .catch(e => {
-          // console.log(e)
+
         })
     }
 
@@ -337,7 +333,6 @@ export default {
         edit.value = true
       }
     }
-
 
     const onReset = () => {
       formData.value = {
@@ -357,7 +352,6 @@ export default {
       }
     }
 
-
     onMounted(() => {
       validateEdit(),
         getDataUser(),
@@ -373,12 +367,9 @@ export default {
       dependencies,
       series,
       subseries,
-
       edit,
-
       addData,
       updateData,
-
       onCancel,
       onReset,
 

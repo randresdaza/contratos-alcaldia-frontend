@@ -149,7 +149,6 @@ export default {
         })
         .catch(e => {
           modal.value = false
-          console.log(e)
           Swal.fire(
             'Error',
             'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
@@ -181,7 +180,6 @@ export default {
               getData()
             })
             .catch(e => {
-              console.log(e)
               Swal.fire(
                 'Error',
                 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
