@@ -1,5 +1,6 @@
 import { boot } from 'quasar/wrappers'
 import axios from 'axios'
+import Cookies from 'js-cookie'
 
 // Be careful when using SSR for cross-request state pollution
 // due to creating a Singleton instance here;
@@ -11,7 +12,7 @@ const api = axios.create({ baseURL: 'http://127.0.0.1:8000' })
 
 api.interceptors.request.use((config) => {
 
-  const accessToken = localStorage.getItem('access')
+  const accessToken = Cookies.get('access')
 
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`

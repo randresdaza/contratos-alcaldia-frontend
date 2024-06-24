@@ -13,8 +13,7 @@ const uploadFile = async (files) => {
     }
     return uploadedFiles
   } catch (error) {
-    console.error('Error al cargar archivos, revisar logs')
-    console.log(error)
+    console.error('Error al cargar archivos.')
     return null
   }
 }

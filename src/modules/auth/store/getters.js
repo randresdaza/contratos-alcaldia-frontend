@@ -2,6 +2,6 @@ export const currentState = (state) => {
   return state.status
 }
 
-export const username = (state) => {
+export const currentUser = (state) => {
   return state.user
 }

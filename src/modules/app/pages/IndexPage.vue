@@ -1,6 +1,6 @@
 <template>
   <q-page class="flex flex-center">
-    <img alt="Logo Alcaldía" src="~assets/logo_alcaldia.png" style="width: 500px; height: 250px" class="responsive-image">
+    <img alt="Logo Alcaldía" src="~assets/Logo v2.jpg" style="width: 330px; height: 420px" class="responsive-image">
   </q-page>
 </template>
 
@@ -9,6 +9,7 @@ import { defineComponent } from 'vue'
 import useAuth from 'src/modules/auth/composables/useAuth';
 import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
+
 
 export default defineComponent({
   name: 'IndexPage',
@@ -25,11 +26,11 @@ export default defineComponent({
           'info',
         ).then((result) => {
           if (result.isConfirmed) {
-            logout()
             router.push({ name: 'login' })
+            logout()
           } else {
-            logout()
             router.push({ name: 'login' })
+            logout()
           }
         })
       }
@@ -41,6 +42,5 @@ export default defineComponent({
 <style scoped>
 .responsive-image {
   max-width: 100%;
-  height: auto;
 }
 </style>

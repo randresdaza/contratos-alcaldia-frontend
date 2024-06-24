@@ -52,8 +52,7 @@
       <q-btn round class="q-mr-xs" color="grey-10" icon="las la-search-plus" @click="zoomIn">
         <q-tooltip class="bg-white text-black">Ampliar</q-tooltip>
       </q-btn>
-      <q-btn v-if="download == 'Activadas'" round class="q-mr-xs" color="grey-10" icon="las la-download"
-        @click="onDownload">
+      <q-btn v-if="downloads" round class="q-mr-xs" color="grey-10" icon="las la-download" @click="onDownload">
         <q-tooltip class="bg-white text-black">Descargar</q-tooltip>
       </q-btn>
     </q-bar>
@@ -89,8 +88,8 @@ export default {
     const numPage = ref(1)
     const scale = ref(1)
     const pdfName = ref()
-    const { username } = useAuth()
-    const download = ref('')
+    const { user } = useAuth()
+    const downloads = ref(user.value.downloads)
 
     const onBack = () => {
       router.push({ name: 'docs' })
@@ -228,32 +227,8 @@ export default {
         })
     }
 
-    const getDataUser = async () => {
-      await api.get(`/users/username/${username.value}/`)
-        .then(result => {
-          download.value = result.data.descargas
-        })
-        .catch(e => {
-          if (e.response.status == 401) {
-            Swal.fire(
-              {
-                html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
-                icon: 'info'
-              }
-            ).then((result) => {
-              if (result.isConfirmed) {
-                router.push({ name: 'login' })
-              } else {
-                router.push({ name: 'login' })
-              }
-            })
-          }
-        })
-    }
-
     onMounted(async () => {
       await getData()
-      await getDataUser()
       await decodeUrl()
       await loadAndDisplayPdf()
     })
@@ -270,7 +245,7 @@ export default {
       onDownload,
       pdfViewer,
       pdfName,
-      download,
+      downloads,
 
       preventContextMenu(event) {
         event.preventDefault();

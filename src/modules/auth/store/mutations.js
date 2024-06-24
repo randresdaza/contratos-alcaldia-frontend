@@ -1,26 +1,24 @@
-export const loginUser = (state, { username, access, refresh }) => {
+import Cookies from "js-cookie"
+
+export const loginUser = (state, { access, refresh, user }) => {
   if (access) {
-    localStorage.setItem('access', access)
-    state.accessToken = access
+    Cookies.set('access', access, { expires: 1, secure: true, sameSite: 'Strict' })
   }
   if (refresh) {
-    localStorage.setItem('refresh', refresh)
-    state.refreshToken = refresh
+    Cookies.set('refresh', refresh, { expires: 1, secure: true, sameSite: 'Strict' })
   }
-  if (username) {
-    localStorage.setItem('user', username)
-    state.user = username
+  if (user) {
+    Cookies.set('user', JSON.stringify(user), { expires: 1, secure: true, sameSite: 'Strict' })
+    state.user = user
   }
   state.status = 'authenticated'
 }
 
 export const logout = (state) => {
   state.user = null
-  state.accessToken = null
-  state.refreshToken = null
   state.status = 'not-authenticated'
 
-  localStorage.removeItem('access')
-  localStorage.removeItem('refresh')
-  localStorage.removeItem('user')
+  Cookies.remove('access')
+  Cookies.remove('refresh')
+  Cookies.remove('user')
 }

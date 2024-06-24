@@ -1,33 +1,32 @@
 <template>
-  <div class="q-pa-lg" style="display: flex; align-items: center; justify-content: center; flex-direction: column;">
+  <div class="q-pa-xl" style="display: flex; align-items: center; justify-content: center; flex-direction: column;">
     <q-form @submit="addData">
       <div class="row items-center">
-        <q-select style="width: 200px;max-width: 80vw; max-height: 80vw;" filled v-model="formData.nombre"
+        <q-select style="width: 200px;max-width: 80vw; max-height: 80vw;" filled v-model="formData.name"
           :options="roles" label="Seleccionar Rol" :rules="[val => !!val || 'Este campo es obligatorio']" />
         <q-btn push class="q-mb-lg q-mt-xs q-ml-md q-pt-md q-pb-md" color="secondary" icon-right="las la-save"
           label="Guardar" type="submit" />
       </div>
     </q-form>
 
-    <q-table class="my-sticky-virtscroll-table q-mt-xs col justify-center"
-      style="width: 500px;max-width: 80vw; max-height: 80vw;" virtual-scroll flat bordered title="Roles"
-      :rows="sortedData" :columns="columns" :virtual-scroll-sticky-size-start="48" row-key="id"
-      v-model:pagination.sync="pagination" :rows-per-page-options="[5, 10, 30, 50]"
-      :rows-per-page-label="'Registros por página'" :filter="filter" :no-data-label="'No hay datos disponibles'"
-      :no-results-label="'No se encontraron registros'">
+    <q-table class="my-sticky-header-table-roles q-mt-md col justify-center"
+      style="width: 500px; max-width: 80vw; max-height: 80vw;" virtual-scroll flat bordered title="Roles" :rows="data"
+      :columns="columns" :virtual-scroll-sticky-size-start="48" row-key="id" v-model:pagination.sync="pagination"
+      :rows-per-page-options="[]" :rows-per-page-label="'Registros por página'" :filter="filter"
+      :no-data-label="'No hay datos disponibles'" :no-results-label="'No se encontraron registros'">
       <template v-slot:top-right>
-        <q-input dense debounce="300" v-model="filter" placeholder="Buscar">
+        <!-- <q-input dense debounce="300" v-model="filter" placeholder="Buscar">
           <template v-slot:append>
             <q-icon name="search" />
           </template>
-        </q-input>
+</q-input> -->
       </template>
       <template v-slot:body="props">
         <q-tr :props="props">
-          <q-td key="nombre">{{ props.row.nombre }}</q-td>
-          <q-td class="center" key="actions">
+          <q-td key="name">{{ props.row.name }}</q-td>
+          <q-td class="right" key="actions">
             <q-btn push icon="las la-trash-alt" color="negative" label="Eliminar" stack glossy
-              @click="onDelete(props.row.id)"></q-btn>
+              @click="onDelete(props.row)"></q-btn>
           </q-td>
         </q-tr>
       </template>
@@ -45,18 +44,17 @@ import { useRouter } from 'vue-router';
 export default {
   setup() {
     const router = useRouter()
-
     const pagination = ref({})
     const filter = ref('')
 
     const data = ref([])
 
     const formData = ref({
-      nombre: '',
+      name: '',
     })
 
     const columns = [
-      { name: 'nombre', align: 'left', label: 'NOMBRE', field: 'nombre', sortable: true },
+      { name: 'name', align: 'left', label: 'NOMBRE', field: 'name', sortable: true },
       { name: 'actions', align: 'right', label: 'ACCIONES' }
     ]
 
@@ -75,8 +73,10 @@ export default {
             ).then((result) => {
               if (result.isConfirmed) {
                 router.push({ name: 'login' })
+                logout()
               } else {
                 router.push({ name: 'login' })
+                logout()
               }
             })
           }
@@ -93,7 +93,7 @@ export default {
           if (e.response.status == 400) {
             Swal.fire(
               {
-                html: `Ya existe el rol ${formData.value.nombre}.`,
+                html: `Ya existe el rol (${formData.value.name}).`,
                 icon: 'info'
               }
             )
@@ -103,7 +103,15 @@ export default {
                 html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
                 icon: 'info'
               }
-            )
+            ).then((result) => {
+              if (result.isConfirmed) {
+                router.push({ name: 'login' })
+                logout()
+              } else {
+                router.push({ name: 'login' })
+                logout()
+              }
+            })
           }
         })
     }
@@ -121,7 +129,7 @@ export default {
         reverseButtons: true
       }).then((result) => {
         if (result.isConfirmed) {
-          api.delete(`/roles/${data}/`)
+          api.delete(`/roles/${data.id}/`)
             .then(result => {
               Swal.fire(
                 'Eliminado!',
@@ -131,26 +139,40 @@ export default {
               getData()
             })
             .catch(e => {
-              Swal.fire(
-                'Error',
-                'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
-                'info',
-              )
+              if (e.response.status == 401) {
+                Swal.fire(
+                  {
+                    html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
+                    icon: 'info'
+                  }
+                ).then((result) => {
+                  if (result.isConfirmed) {
+                    router.push({ name: 'login' })
+                    logout()
+                  } else {
+                    router.push({ name: 'login' })
+                    logout()
+                  }
+                })
+              } else if (e.response.status == 500) {
+                Swal.fire(
+                  {
+                    icon: 'error',
+                    title: 'Error',
+                    html: `El rol (${data.name}) se encuentra asociado a uno o varios usuarios.`,
+                  }
+                )
+              }
             })
         }
       })
     };
-
-    const sortedData = computed(() => {
-      return [...data.value].sort((a, b) => a.id - b.id)
-    })
 
     onMounted(() => {
       getData()
     })
 
     return {
-      sortedData,
       pagination,
       filter,
       columns,
@@ -170,17 +192,18 @@ export default {
 </script>
 
 
-<style lang="sass" scoped>
-.center
+<style lang="sass">
+.right
   text-align: right
-.my-sticky-virtscroll-table
+
+.my-sticky-header-table-roles
   /* height or max-height is important */
   height: 380px
 
   .q-table__top,
   .q-table__bottom,
   thead tr:first-child th /* bg color is important for th; just specify one */
-    background-color: #ffffff
+    background-color: #f5f5f5
 
   thead tr th
     position: sticky

@@ -12,8 +12,9 @@
         </div>
 
         <div class="row justify-center">
-          <q-select class="col-xs-12 col-sm-10 col-md-4 q-ml-md q-mr-md" filled v-model="formData.serie" :options="series"
-            label="Serie" option-label="nombre" :rules="[val => !!val || 'Este campo es obligatorio']" />
+          <q-select class="col-xs-12 col-sm-10 col-md-4 q-ml-md q-mr-md" filled v-model="formData.serie"
+            :options="series" label="Serie" option-label="nombre"
+            :rules="[val => !!val || 'Este campo es obligatorio']" />
           <q-select class="col-xs-12 col-sm-10 col-md-4 q-ml-md q-mr-md" filled v-model="formData.subserie"
             :options="subseries" label="Subserie" option-label="nombre"
             :rules="[val => !!val || 'Este campo es obligatorio']" />
@@ -23,7 +24,7 @@
           <q-input class="col-xs-12 col-sm-10 col-md-4 q-ml-md q-mr-md" @click="dateClosePopup = false"
             label="Fecha Inicial" filled v-model="formData.fecha_inicial" input-class="cursor-pointer" mask="####-##-##"
             lazy-rules :rules="[val => val && val.length > 0 || 'Este campo es obligatorio']">
-            <q-popup-proxy transition-show="scale" transition-hide="scale">
+            <q-popup-proxy transition-show="scale" transition-hide="scale" @hide="checkDate">
               <q-date v-close-popup="dateClosePopup" @input="dateClosePopup = true"
                 @update:model-value="dateClosePopup = true" @navigation="dateClosePopup = false"
                 v-model="formData.fecha_inicial" mask="YYYY-MM-DD" :locale="myLocale" today-btn>
@@ -40,7 +41,7 @@
           <q-input class="col-xs-12 col-sm-10 col-md-4 q-ml-md q-mr-md" @click="dateClosePopup = false"
             label="Fecha Final" filled v-model="formData.fecha_final" input-class="cursor-pointer" mask="####-##-##"
             lazy-rules :rules="[val => val && val.length > 0 || 'Este campo es obligatorio']">
-            <q-popup-proxy transition-show="scale" transition-hide="scale">
+            <q-popup-proxy transition-show="scale" transition-hide="scale" @hide="checkDate">
               <q-date v-close-popup="dateClosePopup" @input="dateClosePopup = true"
                 @update:model-value="dateClosePopup = true" @navigation="dateClosePopup = false"
                 v-model="formData.fecha_final" mask="YYYY-MM-DD" :locale="myLocale" today-btn>
@@ -56,11 +57,11 @@
         </div>
 
         <div class="row justify-center">
-          <q-input class="col-xs-12 col-sm-10 col-md-4 q-ml-md q-mr-md" filled v-model="formData.estante" label="Estante"
-            type="number" lazy-rules
+          <q-input class="col-xs-12 col-sm-10 col-md-4 q-ml-md q-mr-md" filled v-model="formData.estante"
+            label="Estante" type="number" lazy-rules
             :rules="[val => val.length > 0 || 'Este campo es obligatorio', val => val > 0 || 'Debe ser mayor que cero']" />
-          <q-input class="col-xs-12 col-sm-10 col-md-4 q-ml-md q-mr-md" filled v-model="formData.bandeja" label="Bandeja"
-            type="number" lazy-rules
+          <q-input class="col-xs-12 col-sm-10 col-md-4 q-ml-md q-mr-md" filled v-model="formData.bandeja"
+            label="Bandeja" type="number" lazy-rules
             :rules="[val => val.length > 0 || 'Este campo es obligatorio', val => val > 0 || 'Debe ser mayor que cero']" />
         </div>
 
@@ -103,7 +104,7 @@ import useAuth from 'src/modules/auth/composables/useAuth';
 export default {
   props: ['id'],
   setup(props) {
-    const { username } = useAuth()
+    const { user, logout } = useAuth()
     const router = useRouter()
     const date = new Date()
     const day = date.getDate()
@@ -117,7 +118,7 @@ export default {
     const series = ref([])
     const subseries = ref([])
     const edit = ref(false)
-    const dataUser = ref([])
+    const currentUser = ref(user.value)
 
     const formData = ref({
       id: '',
@@ -136,16 +137,6 @@ export default {
       usuario: ''
     })
 
-    const getDataUser = async () => {
-      await api.get(`/users/username/${username.value}/`)
-        .then(result => {
-          dataUser.value = result.data;
-        })
-        .catch(e => {
-
-        })
-    }
-
     const getDataToEdit = async () => {
       if (edit.value) {
         await api.get(`/contratos/${props.id}/`)
@@ -162,8 +153,10 @@ export default {
               ).then((result) => {
                 if (result.isConfirmed) {
                   router.push({ name: 'login' })
+                  logout()
                 } else {
                   router.push({ name: 'login' })
+                  logout()
                 }
               })
             }
@@ -172,6 +165,15 @@ export default {
     }
 
     const addData = async () => {
+      if (formData.value.fecha_inicial > formData.value.fecha_final) {
+        Swal.fire(
+          {
+            html: 'La fecha inicial no puede ser mayor a la fecha final.',
+            icon: 'info'
+          }
+        )
+        return
+      }
       const dataToSave = {
         asunto: formData.value.asunto,
         fecha_inicial: formData.value.fecha_inicial,
@@ -184,7 +186,7 @@ export default {
         dependencia: formData.value.dependencia.id,
         serie: formData.value.serie.id,
         subserie: formData.value.subserie.id,
-        usuario: dataUser.value.id
+        usuario: currentUser.value.id
       }
       await api.post('/contratos/', dataToSave)
         .then(result => {
@@ -199,7 +201,9 @@ export default {
             cancelButtonText: 'No',
             reverseButtons: true
           }).then((result) => {
-            if (result.isDismissed) {
+            if (result.isConfirmed) {
+              onReset()
+            } else if (result.isDismissed) {
               router.push({ name: 'contracts' })
             }
           })
@@ -221,8 +225,10 @@ export default {
             ).then((result) => {
               if (result.isConfirmed) {
                 router.push({ name: 'login' })
+                logout()
               } else {
                 router.push({ name: 'login' })
+                logout()
               }
             })
           }
@@ -243,7 +249,7 @@ export default {
         dependencia: formData.value.dependencia.id,
         serie: formData.value.serie.id,
         subserie: formData.value.subserie.id,
-        usuario: dataUser.value.id
+        usuario: currentUser.value.id
       }
       await api.put(`/contratos/${props.id}/`, dataToSave)
         .then(result => {
@@ -260,7 +266,7 @@ export default {
           if (e.response.status == 400) {
             Swal.fire(
               {
-                html: `Ya existe el contrato con asunto ${formData.value.asunto}.`,
+                html: `Ya existe el contrato con asunto (${formData.value.asunto}).`,
                 icon: 'info'
               }
             )
@@ -273,8 +279,10 @@ export default {
             ).then((result) => {
               if (result.isConfirmed) {
                 router.push({ name: 'login' })
+                logout()
               } else {
                 router.push({ name: 'login' })
+                logout()
               }
             })
           }
@@ -288,7 +296,7 @@ export default {
     const getDependencies = async () => {
       await api.get('/dependencias/')
         .then(result => {
-          dependencies.value = result.data
+          dependencies.value = result.data.results
         })
         .catch(e => {
           if (e.response.status == 401) {
@@ -300,8 +308,10 @@ export default {
             ).then((result) => {
               if (result.isConfirmed) {
                 router.push({ name: 'login' })
+                logout()
               } else {
                 router.push({ name: 'login' })
+                logout()
               }
             })
           }
@@ -311,20 +321,50 @@ export default {
     const getSeries = async () => {
       await api.get('/series/')
         .then(result => {
-          series.value = result.data
+          series.value = result.data.results
         })
         .catch(e => {
-
+          if (e.response.status == 401) {
+            Swal.fire(
+              {
+                html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
+                icon: 'info'
+              }
+            ).then((result) => {
+              if (result.isConfirmed) {
+                router.push({ name: 'login' })
+                logout()
+              } else {
+                router.push({ name: 'login' })
+                logout()
+              }
+            })
+          }
         })
     }
 
     const getSubseries = async () => {
       await api.get('/subseries/')
         .then(result => {
-          subseries.value = result.data
+          subseries.value = result.data.results
         })
         .catch(e => {
-
+          if (e.response.status == 401) {
+            Swal.fire(
+              {
+                html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
+                icon: 'info'
+              }
+            ).then((result) => {
+              if (result.isConfirmed) {
+                router.push({ name: 'login' })
+                logout()
+              } else {
+                router.push({ name: 'login' })
+                logout()
+              }
+            })
+          }
         })
     }
 
@@ -352,9 +392,21 @@ export default {
       }
     }
 
+    const checkDate = () => {
+      if (formData.value.fecha_final < formData.value.fecha_inicial) {
+        Swal.fire(
+          {
+            html: 'La fecha final no puede ser menor a la fecha inicial.',
+            icon: 'info'
+          }
+        )
+        formData.value.fecha_final = formData.value.fecha_inicial
+      }
+    }
+
     onMounted(() => {
       validateEdit(),
-        getDataUser(),
+        // getDataUser(),
         getDataToEdit(),
         getDependencies(),
         getSeries(),
@@ -372,6 +424,8 @@ export default {
       updateData,
       onCancel,
       onReset,
+
+      checkDate,
 
       myLocale: {
         /* starting with Sunday */

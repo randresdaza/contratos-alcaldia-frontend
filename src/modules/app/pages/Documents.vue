@@ -1,13 +1,18 @@
 <template>
   <div class="q-pa-lg">
-    <q-table class="my-sticky-virtscroll-table" virtual-scroll flat bordered title="Documentos" :rows="sortedData"
+    <q-table class="my-sticky-header-table-documents" virtual-scroll flat bordered title="Documentos" :rows="data"
       :columns="columns" :virtual-scroll-sticky-size-start="48" row-key="id" v-model:pagination.sync="pagination"
-      :rows-per-page-options="[5, 10, 30, 50]" :rows-per-page-label="'Registros por página'" :filter="filter"
-      :no-data-label="'No hay datos disponibles'" :no-results-label="'No se encontraron registros'">
+      :rows-per-page-options="[10, 20, 30, 50]" :rows-per-page-label="'Registros por página'" :filter="filter"
+      :no-data-label="'No hay datos disponibles'" :no-results-label="'No se encontraron registros'"
+      @request="onRequest">
       <template v-slot:top-right>
-        <q-input borderless dense debounce="300" v-model="filter" placeholder="Buscar">
+        <div>
+          <span class="text-subtitle2 q-mr-md">Filtrar por nombre:</span>
+        </div>
+        <q-input ref="filterInputRef" dense debounce="300" v-model="filter" placeholder="Buscar">
           <template v-slot:append>
-            <q-icon name="search" />
+            <q-icon v-if="!filter" name="search" />
+            <q-icon v-if="filter" class="clickable-icon" name="cancel" @click="clearFilter" />
           </template>
         </q-input>
       </template>
@@ -20,24 +25,25 @@
           <q-td key="contrato_id">{{ props.row.contrato.id }}</q-td>
           <q-td key="contrato_asunto">{{ props.row.contrato.asunto }}</q-td>
           <q-td class="center" key="actions">
-            <q-btn push class="q-mr-xs" icon="las la-file-pdf" color="red-14" label="Ver PDF" stack glossy
+            <q-btn push class="q-mr-xs" icon="picture_as_pdf" color="red-14" label="Ver PDF" stack glossy
               @click="onView(props.row)"></q-btn>
           </q-td>
         </q-tr>
       </template>
     </q-table>
 
-    <q-btn push class="q-mt-lg q-mb-md q-pt-md q-pb-md" color="standard" text-color="black" icon="las la-undo"
-      label="Regresar" @click="onBack" />
+    <q-btn push class="q-mt-md q-pt-md q-pb-md" color="standard" text-color="black" icon="las la-undo" label="Regresar"
+      @click="onBack" />
   </div>
 </template>
 
 <script>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { api } from 'src/boot/axios';
 import Swal from 'sweetalert2';
 import { useRouter } from 'vue-router';
 import CryptoJS from 'crypto-js';
+import useAuth from 'src/modules/auth/composables/useAuth';
 
 export default {
   props: ['id'],
@@ -46,6 +52,9 @@ export default {
     const pagination = ref({})
     const filter = ref('')
     const data = ref([])
+
+    const filterInputRef = ref(null);
+
 
     const columns = [
       { name: 'id', align: 'left', label: 'ID', field: 'id', sortable: true },
@@ -57,10 +66,19 @@ export default {
       { name: 'actions', align: 'center', label: 'ACCIONES' }
     ]
 
-    const getDataDocs = async () => {
-      await api.get(`/documentos/contrato/${props.id}/`)
+    const onRequest = (props) => {
+      const { page, rowsPerPage, sortBy, descending } = props.pagination
+      const filter = props.filter
+      pagination.value.page = page
+      pagination.value.rowsPerPage = rowsPerPage
+      getDataDocs(filter)
+    }
+
+    const getDataDocs = async (filter) => {
+      await api.get(`/documentos/contrato/${props.id}/?filter=${filter}&page=${pagination.value.page}&page_size=${pagination.value.rowsPerPage}`)
         .then(result => {
-          data.value = result.data;
+          data.value = result.data.results;
+          pagination.value.rowsNumber = result.data.count;
           for (let i = 0; i < data.value.length; i++) {
             let fecha = new Date(data.value[i].fecha_creacion)
             fecha.setHours(fecha.getHours())
@@ -104,21 +122,24 @@ export default {
       router.push({ name: 'view-doc', params: { idDoc: data.id, file: fileEncriptado } })
     }
 
-    const sortedData = computed(() => {
-      return [...data.value].sort((a, b) => b.id - a.id)
-    })
+    const clearFilter = () => {
+      filter.value = ''
+      filterInputRef.value.focus()
+    }
 
     onMounted(() => {
-      getDataDocs()
+      getDataDocs(filter.value)
     })
 
     return {
-      sortedData,
       pagination,
       filter,
       columns,
-
       data,
+
+      onRequest,
+      filterInputRef,
+      clearFilter,
 
       onView,
       onBack,
@@ -128,28 +149,30 @@ export default {
 </script>
 
 
-<style lang="sass" scoped>
+<style lang="sass">
 .center
   text-align: center
 
-.my-sticky-virtscroll-table
+.my-sticky-header-table-documents
   /* height or max-height is important */
-  height: 535px
+  height: 540px
 
   .q-table__top,
   .q-table__bottom,
-  thead tr:first-child th /* bg color is important for th; just specify one */
-    background-color: #ffffff
+  thead tr:first-child th
+    /* bg color is important for th; just specify one */
+    background-color: #f5f5f5
 
   thead tr th
     position: sticky
     z-index: 1
-  /* this will be the loading indicator */
-  thead tr:last-child th
-    /* height of all previous header rows */
-    top: 48px
   thead tr:first-child th
     top: 0
+
+  /* this is when the loading indicator appears */
+  &.q-table--loading thead tr:last-child th
+    /* height of all previous header rows */
+    top: 48px
 
   /* prevent scrolling behind sticky top row on focus */
   tbody

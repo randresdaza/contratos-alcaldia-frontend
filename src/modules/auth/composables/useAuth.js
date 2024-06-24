@@ -1,6 +1,7 @@
 import { computed } from "vue"
 import { useStore } from "vuex"
 
+
 const useAuth = () => {
   const store = useStore()
 
@@ -30,7 +31,7 @@ const useAuth = () => {
     logout,
 
     authStatus: computed(() => store.getters['auth/currentState']),
-    username: computed(() => store.getters['auth/username']),
+    user: computed(() => store.getters['auth/currentUser'])
   }
 }
 

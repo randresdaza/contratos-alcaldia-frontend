@@ -8,9 +8,9 @@
       <apexchart v-if="validateDataDocs != 0" type="pie" width="440" :options="chartOptionsDocs" :series="seriesDocs">
       </apexchart>
     </div>
-    <q-table class="my-sticky-virtscroll-table q-mt-xs" virtual-scroll flat bordered title="Estadísticas por Usuarios"
-      :rows="data" :columns="columns" :virtual-scroll-sticky-size-start="48" row-key="id"
-      v-model:pagination.sync="pagination" :rows-per-page-options="[10, 20, 30, 50]"
+    <q-table class="my-sticky-header-table-reports q-mt-xs" virtual-scroll flat bordered
+      title="Estadísticas por Usuarios" :rows="data" :columns="columns" :virtual-scroll-sticky-size-start="48"
+      row-key="id" v-model:pagination.sync="pagination" :rows-per-page-options="[10, 20, 30, 50]"
       :rows-per-page-label="'Registros por página'" :filter="filter" :no-data-label="'No hay datos disponibles'"
       :no-results-label="'No se encontraron registros'">
       <template v-slot:top-right>
@@ -23,10 +23,10 @@
           del: <b>{{ oneDay }}</b>
         </div>
         <q-btn outline rounded color="primary" class="q-mr-md">
-          <div>Filtrar</div>
+          <div>Filtrar por Fecha</div>
           <q-icon right size="2em" name="event" />
           <q-popup-proxy transition-show="scale" transition-hide="scale" @show="show" @hide="hide">
-            <q-date v-model="dateFilter" :locale="myLocale" range>
+            <q-date today-btn v-model="dateFilter" :locale="myLocale" range>
               <div class="row items-center justify-end q-gutter-xs">
                 <q-btn v-close-popup label="Limpiar" color="primary" @click="clearFilter" flat></q-btn>
                 <q-btn v-close-popup label="Filtrar" color="primary" @click="filterData"></q-btn>
@@ -197,18 +197,18 @@ export default defineComponent({
       if (numElements == 2) {
         await api.get(`/reportes/?fromDate=${from.value}&toDate=${to.value}`)
           .then(result => {
-            data.value = result.data;
+            data.value = result.data
             if (data.value.length === 0) {
               Swal.fire(
                 {
-                  html: 'No se encontraron registros.<br>Seleccione una fecha o un rango de fechas.',
+                  html: 'No se encontraron registros.',
                   icon: 'info'
                 }
               ).then((result) => {
                 if (result.isConfirmed) {
-                  clearFilter()
+                  // clearFilter()
                 } else {
-                  clearFilter()
+                  // clearFilter()
                 }
               })
             }
@@ -305,14 +305,14 @@ export default defineComponent({
             if (data.value.length === 0) {
               Swal.fire(
                 {
-                  html: 'No se encontraron registros.<br>Seleccione una fecha o un rango de fechas.',
+                  html: 'No se encontraron registros.',
                   icon: 'info'
                 }
               ).then((result) => {
                 if (result.isConfirmed) {
-                  clearFilter()
+                  // clearFilter()
                 } else {
-                  clearFilter()
+                  // clearFilter()
                 }
               })
             }
@@ -493,11 +493,11 @@ export default defineComponent({
     }
 
     onMounted(async () => {
-      $q.loading.show({
-        message: 'Cargando...'
-      })
-      await getData()
-      $q.loading.hide()
+      // $q.loading.show({
+      //   message: 'Cargando...'
+      // })
+      getData()
+      // $q.loading.hide()
     })
 
     watch(from, (newFrom) => {
@@ -511,6 +511,7 @@ export default defineComponent({
       columns,
       sortedData,
       data,
+
       dateFilter,
       dateClosePopup,
       filterData,
@@ -523,6 +524,7 @@ export default defineComponent({
       today,
       show,
       hide,
+
       seriesContracts,
       chartOptionsContracts,
       seriesDocs,
@@ -543,25 +545,27 @@ export default defineComponent({
 })
 </script>
 
-<style scoped lang="sass">
-.my-sticky-virtscroll-table
+<style lang="sass">
+.my-sticky-header-table-reports
   /* height or max-height is important */
   height: 500px
 
   .q-table__top,
   .q-table__bottom,
-  thead tr:first-child th /* bg color is important for th; just specify one */
-    background-color: #ffffff
+  thead tr:first-child th
+    /* bg color is important for th; just specify one */
+    background-color: #f5f5f5
 
   thead tr th
     position: sticky
     z-index: 1
-  /* this will be the loading indicator */
-  thead tr:last-child th
-    /* height of all previous header rows */
-    top: 48px
   thead tr:first-child th
     top: 0
+
+  /* this is when the loading indicator appears */
+  &.q-table--loading thead tr:last-child th
+    /* height of all previous header rows */
+    top: 48px
 
   /* prevent scrolling behind sticky top row on focus */
   tbody

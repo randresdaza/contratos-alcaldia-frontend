@@ -10,11 +10,11 @@
 
         <div class="q-pa-xs q-ma-xs q-mr-md">
           <div class="text-center">
-            Usuario: {{ username }}
+            Usuario: {{ currentUser.username }}
           </div>
-          <!-- <q-space /> -->
+
           <div class="text-center">
-            Rol: {{ rol.nombre }}
+            Rol: {{ currentUser.role.name }}
           </div>
         </div>
 
@@ -29,16 +29,13 @@
 
     <q-drawer v-model="sideMenuOpen" show-if-above bordered>
       <q-list>
-        <q-item-label header>
-          <img class="fixed-top q-mr-auto q-ml-auto q-mt-xs" src="~assets/logo.jpg" alt="Logo"
-            style="width: 100px; height: 80px">
+        <q-item-label>
+          <img class="row justify-center q-ml-auto q-mr-auto q-mt-xs" src="~assets/logo.jpg" alt="Logo"
+            style="width: 150px; height: 100px">
         </q-item-label>
 
-        <q-item-label header>
-        </q-item-label>
-
-        <q-item-label header>
-          Navegación
+        <q-item-label class="q-ml-md q-mb-xs q-pt-xs" style="font-weight: bold; font-size: 16px; color: black;">
+          Menú de Navegación
         </q-item-label>
         <EssentialLink v-for="link in linksList" :key="link.title" v-bind="link" />
       </q-list>
@@ -51,7 +48,7 @@
 </template>
 
 <script>
-import { defineComponent, onBeforeMount, ref } from 'vue'
+import { computed, defineComponent, ref } from 'vue'
 import EssentialLink from 'src/modules/app/components/EssentialLink.vue'
 import { linksListAdmin } from 'src/modules/app/router/link-list-admin';
 import { linksListDig } from 'src/modules/app/router/link-list-dig';
@@ -59,7 +56,7 @@ import { linksListSup } from 'src/modules/app/router/link-list-sup';
 import { useRouter } from 'vue-router';
 import useAuth from 'src/modules/auth/composables/useAuth';
 import useUI from 'src/modules/app/composables/useUI';
-import { api } from 'src/boot/axios';
+
 
 export default defineComponent({
   name: 'MainLayout',
@@ -67,55 +64,42 @@ export default defineComponent({
     EssentialLink
   },
   setup() {
-    // const leftDrawerOpen = ref(false)
     const router = useRouter()
-    const { username, logout } = useAuth()
-    const { sideMenuOpen, toggleSideMenu } = useUI()
-    const data = ref([])
-    const rol = ref([])
-    const linksList = ref([])
+    const { user, logout } = useAuth()
+    const { sideMenuOpen, toggleSideMenu, selectedMenuItem } = useUI()
+    const currentUser = ref(user.value)
 
-    const getData = async () => {
-      await api.get(`/users/username/${username.value}/`)
-        .then(result => {
-          data.value = result.data;
-          rol.value = data.value.rol
-          getOptions()
-        })
-        .catch(e => {
-          console.log(e)
-        })
-    }
-
-    const getOptions = () => {
-      if (rol.value.nombre === 'Administrador') {
-        linksList.value = linksListAdmin
+    const linksList = computed(() => {
+      switch (currentUser.value.role.name) {
+        case 'Administrador':
+          return linksListAdmin
+        case 'Supervisor':
+          return linksListSup
+        case 'Digitador':
+          return linksListDig
+        default:
+          return []
       }
-      if (rol.value.nombre === 'Supervisor') {
-        linksList.value = linksListSup
-      }
-      if (rol.value.nombre === 'Digitador') {
-        linksList.value = linksListDig
-      }
-    }
-
-    onBeforeMount(() => {
-      getData()
     })
 
     return {
       linksList,
       sideMenuOpen,
       toggleSideMenu,
-      rol,
-      username,
+      currentUser,
+      selectedMenuItem,
 
       onLogout: () => {
         router.push({ name: 'login' })
-        rol.value = []
         logout()
       }
     }
   }
 })
 </script>
+
+<style scoped>
+.responsive-image {
+  max-width: 100%;
+}
+</style>

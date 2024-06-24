@@ -2,43 +2,43 @@ export const linksListSup = [
   {
     title: 'Inicio',
     caption: 'Página Principal',
-    icon: 'las la-home',
+    icon: 'home',
     link: 'home'
   },
   {
     title: 'Contratos',
     caption: 'Gestión de Contratos',
-    icon: 'las la-folder',
+    icon: 'folder',
     link: 'contracts'
   },
   {
     title: 'Dependencias',
     caption: 'Gestión de Dependencias',
-    icon: 'las la-building',
+    icon: 'domain',
     link: 'dependencies'
   },
   {
     title: 'Series',
     caption: 'Gestión de Series',
-    icon: 'las la-align-justify',
+    icon: 'format_align_justify',
     link: 'series'
   },
   {
     title: 'Subseries',
     caption: 'Gestión de Subseries',
-    icon: 'las la-align-center',
+    icon: 'format_align_center',
     link: 'subseries'
   },
   {
     title: 'Auditoría',
     caption: 'Consultar Históricos',
-    icon: 'las la-search',
+    icon: 'person_search',
     link: 'audit'
   },
   {
     title: 'Reportes',
     caption: 'Visualización de Reportes',
-    icon: 'las la-chart-bar',
+    icon: 'pie_chart',
     link: 'reports'
   },
 ]

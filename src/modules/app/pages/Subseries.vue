@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-lg">
+  <div class="q-pa-md">
     <q-form @submit="addData">
       <div class="row items-center">
         <q-input style="width: 300px;max-width: 80vw; max-height: 80vw;" filled v-model="formData.nombre"
@@ -10,15 +10,19 @@
       </div>
     </q-form>
 
-    <q-table class="my-sticky-virtscroll-table q-mt-xs col justify-center" virtual-scroll flat bordered title="Subseries"
-      :rows="sortedData" :columns="columns" :virtual-scroll-sticky-size-start="48" row-key="nombre"
-      v-model:pagination.sync="pagination" :rows-per-page-options="[5, 10, 30, 50]"
+    <q-table class="my-sticky-header-table-subseries q-mt-xs" virtual-scroll flat bordered title="Subseries"
+      :rows="data" :columns="columns" :virtual-scroll-item-size="48" :virtual-scroll-sticky-size-start="48"
+      row-key="nombre" v-model:pagination.sync="pagination" :rows-per-page-options="[10, 20, 30, 50]"
       :rows-per-page-label="'Registros por página'" :filter="filter" :no-data-label="'No hay datos disponibles'"
-      :no-results-label="'No se encontraron registros'">
+      :no-results-label="'No se encontraron registros'" @request="onRequest">
       <template v-slot:top-right>
-        <q-input dense debounce="300" v-model="filter" placeholder="Buscar">
+        <div>
+          <span class="text-subtitle2 q-mr-md">Filtrar por nombre:</span>
+        </div>
+        <q-input ref="filterInputRef" dense debounce="300" v-model="filter" placeholder="Buscar">
           <template v-slot:append>
-            <q-icon name="search" />
+            <q-icon v-if="!filter" name="search" />
+            <q-icon v-if="filter" class="clickable-icon" name="cancel" @click="clearFilter" />
           </template>
         </q-input>
       </template>
@@ -26,7 +30,7 @@
         <q-tr :props="props">
           <q-td key="id">{{ props.row.id }}</q-td>
           <q-td key="nombre">{{ props.row.nombre }}</q-td>
-          <q-td class="center" key="actions">
+          <q-td class="right" key="actions">
             <q-btn push class="q-mr-xs" icon="las la-pencil-alt" color="amber" label="Editar" stack glossy
               @click="onEdit(props.row)"></q-btn>
             <q-btn push icon="las la-trash-alt" color="negative" label="Eliminar" stack glossy
@@ -64,18 +68,22 @@
 </template>
 
 <script>
-import { ref, onMounted, computed, watch } from 'vue'
-import { useRouter } from 'vue-router';
+import { ref, onMounted, watch } from 'vue'
 import { api } from 'src/boot/axios';
 import Swal from 'sweetalert2';
+import { useRouter } from 'vue-router';
+import useAuth from 'src/modules/auth/composables/useAuth';
 
 export default {
   setup() {
     const router = useRouter()
+    const { logout } = useAuth()
     const pagination = ref({})
     const filter = ref('')
     const modal = ref(false)
     const data = ref([])
+
+    const filterInputRef = ref(null);
 
     const formData = ref({
       nombre: '',
@@ -87,15 +95,24 @@ export default {
     })
 
     const columns = [
-      { name: 'id', align: 'left', label: 'ID', field: 'id', sortable: true },
-      { name: 'nombre', align: 'left', label: 'NOMBRE', field: 'nombre', sortable: true },
+      { name: 'id', align: 'left', label: 'ID', field: 'id' },
+      { name: 'nombre', align: 'left', label: 'NOMBRE', field: 'nombre' },
       { name: 'actions', align: 'right', label: 'ACCIONES' }
     ]
 
-    const getData = async () => {
-      await api.get('/subseries/')
+    const onRequest = (props) => {
+      const { page, rowsPerPage, sortBy, descending } = props.pagination
+      const filter = props.filter
+      pagination.value.page = page
+      pagination.value.rowsPerPage = rowsPerPage
+      getData(filter)
+    }
+
+    const getData = async (filter) => {
+      await api.get(`/subseries/?filter=${filter}&page=${pagination.value.page}&page_size=${pagination.value.rowsPerPage}`)
         .then(result => {
-          data.value = result.data;
+          data.value = result.data.results;
+          pagination.value.rowsNumber = result.data.count;
         })
         .catch(e => {
           if (e.response.status == 401) {
@@ -107,8 +124,10 @@ export default {
             ).then((result) => {
               if (result.isConfirmed) {
                 router.push({ name: 'login' })
+                logout()
               } else {
                 router.push({ name: 'login' })
+                logout()
               }
             })
           }
@@ -118,8 +137,8 @@ export default {
     const addData = async () => {
       await api.post('/subseries/', formData.value)
         .then(result => {
+          getData(filter.value)
           Swal.fire('Guardado', 'Registrado con éxito.', 'success')
-          getData()
         })
         .catch(e => {
           if (e.response.status == 400) {
@@ -135,7 +154,15 @@ export default {
                 html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
                 icon: 'info'
               }
-            )
+            ).then((result) => {
+              if (result.isConfirmed) {
+                router.push({ name: 'login' })
+                logout()
+              } else {
+                router.push({ name: 'login' })
+                logout()
+              }
+            })
           }
         })
     }
@@ -143,17 +170,35 @@ export default {
     const updateData = async () => {
       await api.put(`/subseries/${editData.value.id}/`, editData.value)
         .then(result => {
+          getData(filter.value)
           modal.value = false
           Swal.fire('Guardado', 'Actualizado con éxito.', 'success')
-          getData()
         })
         .catch(e => {
           modal.value = false
-          Swal.fire(
-            'Error',
-            'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
-            'info',
-          )
+          if (e.response.status == 400) {
+            Swal.fire(
+              {
+                html: `Ya existe la subserie ${editData.value.nombre}.`,
+                icon: 'info'
+              }
+            )
+          } else if (e.response.status == 401) {
+            Swal.fire(
+              {
+                html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
+                icon: 'info'
+              }
+            ).then((result) => {
+              if (result.isConfirmed) {
+                router.push({ name: 'login' })
+                logout()
+              } else {
+                router.push({ name: 'login' })
+                logout()
+              }
+            })
+          }
         })
     }
 
@@ -172,19 +217,30 @@ export default {
         if (result.isConfirmed) {
           api.delete(`/subseries/${data}/`)
             .then(result => {
+              getData(filter.value)
               Swal.fire(
                 'Eliminado!',
                 'Registro eliminado con éxito.',
                 'success'
               )
-              getData()
             })
             .catch(e => {
-              Swal.fire(
-                'Error',
-                'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
-                'info',
-              )
+              if (e.response.status == 401) {
+                Swal.fire(
+                  {
+                    html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
+                    icon: 'info'
+                  }
+                ).then((result) => {
+                  if (result.isConfirmed) {
+                    router.push({ name: 'login' })
+                    logout()
+                  } else {
+                    router.push({ name: 'login' })
+                    logout()
+                  }
+                })
+              }
             })
         }
       })
@@ -204,22 +260,24 @@ export default {
       }
     }
 
-    const sortedData = computed(() => {
-      return [...data.value].sort((a, b) => b.id - a.id)
+    const clearFilter = () => {
+      filter.value = ''
+      filterInputRef.value.focus()
+    }
+
+    watch(() => formData.value.nombre, (val) => {
+      formData.value.nombre = val.toUpperCase();
     })
 
-    watch(modal, (newValue) => {
-      if (!newValue) {
-        onReset()
-      }
+    watch(() => editData.value.nombre, (val) => {
+      editData.value.nombre = val.toUpperCase();
     })
 
     onMounted(() => {
-      getData()
+      getData(filter.value)
     })
 
     return {
-      sortedData,
       pagination,
       filter,
       columns,
@@ -232,32 +290,42 @@ export default {
       onEdit,
       onDelete,
       onReset,
+
+      onRequest,
+      clearFilter,
+      filterInputRef,
     }
   }
 }
 </script>
 
-<style lang="sass" scoped>
-.center
+<style lang="sass">
+.clickable-icon
+  cursor: pointer
+
+.right
   text-align: right
-.my-sticky-virtscroll-table
+
+.my-sticky-header-table-subseries
   /* height or max-height is important */
-  height: 518px
+  height: 538px
 
   .q-table__top,
   .q-table__bottom,
-  thead tr:first-child th /* bg color is important for th; just specify one */
-    background-color: #ffffff
+  thead tr:first-child th
+    /* bg color is important for th; just specify one */
+    background-color: #f5f5f5
 
   thead tr th
     position: sticky
     z-index: 1
-  /* this will be the loading indicator */
-  thead tr:last-child th
-    /* height of all previous header rows */
-    top: 48px
   thead tr:first-child th
     top: 0
+
+  /* this is when the loading indicator appears */
+  &.q-table--loading thead tr:last-child th
+    /* height of all previous header rows */
+    top: 48px
 
   /* prevent scrolling behind sticky top row on focus */
   tbody

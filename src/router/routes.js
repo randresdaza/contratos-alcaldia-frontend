@@ -1,24 +1,21 @@
 import authRouter from '../modules/auth/router';
-import isAuthenticatedGuard from 'src/modules/auth/router/auth-guard';
+import { isAuthenticatedGuard, isAuthenticated } from 'src/modules/auth/router/auth-guard';
 import appRouter from '../modules/app/router';
 
 const routes = [
   {
     path: '/',
-    redirect: '/app'
-  },
-  {
-    path: '/auth',
-    ...authRouter
-  },
-  {
-    path: '/app',
-    name: 'home',
     beforeEnter: [isAuthenticatedGuard],
     ...appRouter
   },
   {
+    path: '/auth',
+    beforeEnter: [isAuthenticated],
+    ...authRouter
+  },
+  {
     path: '/:catchAll(.*)*',
+    name: 'not-found',
     component: () => import('pages/ErrorNotFound.vue')
   }
 ]

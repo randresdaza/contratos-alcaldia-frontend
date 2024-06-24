@@ -1,9 +1,10 @@
 export default {
-  name: 'app',
+  path: '/',
+  redirect: { name: 'home' },
   component: () => import('src/modules/app/layouts/MainLayout.vue'),
   children: [
     {
-      path: '',
+      path: 'home',
       name: 'home',
       component: () => import('src/modules/app/pages/IndexPage.vue'),
     },
@@ -11,11 +12,13 @@ export default {
       path: 'users',
       name: 'users',
       component: () => import('src/modules/app/pages/Users.vue'),
+      meta: { roles: ['Administrador'] }
     },
     {
-      path: 'rols',
-      name: 'rols',
-      component: () => import('src/modules/app/pages/Rols.vue'),
+      path: 'roles',
+      name: 'roles',
+      component: () => import('src/modules/app/pages/Role.vue'),
+      meta: { roles: ['Administrador'] }
     },
     {
       path: 'contracts',
@@ -39,7 +42,7 @@ export default {
     },
     {
       path: 'contracts/view-docs-contract/:id',
-      name: 'docs',
+      name: 'documents',
       component: () => import('src/modules/app/pages/Documents.vue'),
       props: (route) => {
         return {
@@ -77,11 +80,19 @@ export default {
       path: 'audit',
       name: 'audit',
       component: () => import('src/modules/app/pages/Audit.vue'),
+      meta: { roles: ['Administrador', 'Supervisor'] }
     },
     {
       path: 'reports',
       name: 'reports',
       component: () => import('src/modules/app/pages/Reports.vue'),
+      meta: { roles: ['Administrador', 'Supervisor'] }
+    },
+    {
+      path: 'sftp',
+      name: 'sftp',
+      component: () => import('src/modules/app/pages/SFTP.vue'),
+      meta: { roles: ['Administrador'] }
     },
   ]
 }
