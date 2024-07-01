@@ -65,10 +65,10 @@
               isValidEmail]" />
 
             <q-input v-if="!edit" filled v-model="formData.password" type="password" label="Contraseña" lazy-rules
-              :rules="[val => val && val.length > 0 || 'Este campo es obligatorio']" />
+              :rules="[val => val && val.length > 0 && val.length >= 8 || 'La contraseña debe contener 8 o más caracteres']" />
 
             <q-input v-if="!edit" filled v-model="checkPassword" type="password" label="Confirmar contraseña" lazy-rules
-              :rules="[val => val && val.length > 0 || 'Este campo es obligatorio', isSamePassword]" />
+              :rules="[val => val && val.length > 0 && val.length >= 8 || 'La contraseña debe contener 8 o más caracteres', isSamePassword]" />
 
             <q-select filled v-model="formData.role" :options="roles" label="Rol" option-label="name"
               :rules="[val => !!val || 'Este campo es obligatorio']" />
@@ -315,54 +315,66 @@ export default {
             })
         }
       } else {
-        await api.put(`/users/${props.id}/`, { downloads: !props.downloads })
-          .then(result => {
-            modal.value = false
-            Swal.fire('Guardado', 'Actualizado con éxito.', 'success')
-            getData(filter.value)
-          })
-          .catch(e => {
-            modal.value = false
-            Swal.fire(
-              'Error',
-              'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
-              'info',
-            )
-          })
+        if (props.role.name == "Administrador") {
+          Swal.fire('', 'No puede cambiar los permisos de un usuario administrador.', 'info')
+        } else {
+          await api.put(`/users/${props.id}/`, { downloads: !props.downloads })
+            .then(result => {
+              modal.value = false
+              Swal.fire('Guardado', 'Actualizado con éxito.', 'success')
+              getData(filter.value)
+            })
+            .catch(e => {
+              modal.value = false
+              Swal.fire(
+                'Error',
+                'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
+                'info',
+              )
+            })
+        }
       }
     }
 
     const updateStatus = async (props) => {
       if (props.is_active) {
-        await api.put(`/users/${props.id}/`, { is_active: !props.is_active })
-          .then(result => {
-            modal.value = false
-            Swal.fire('Guardado', 'Actualizado con éxito.', 'success')
-            getData(filter.value)
-          })
-          .catch(e => {
-            modal.value = false
-            Swal.fire(
-              'Error',
-              'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
-              'info',
-            )
-          })
+        if (props.role.name == "Administrador") {
+          Swal.fire('', 'No puede cambiar los permisos de un usuario administrador.', 'info')
+        } else {
+          await api.put(`/users/${props.id}/`, { is_active: !props.is_active })
+            .then(result => {
+              modal.value = false
+              Swal.fire('Guardado', 'Actualizado con éxito.', 'success')
+              getData(filter.value)
+            })
+            .catch(e => {
+              modal.value = false
+              Swal.fire(
+                'Error',
+                'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
+                'info',
+              )
+            })
+        }
       } else {
-        await api.put(`/users/${props.id}/`, { is_active: !props.is_active })
-          .then(result => {
-            modal.value = false
-            Swal.fire('Guardado', 'Actualizado con éxito.', 'success')
-            getData(filter.value)
-          })
-          .catch(e => {
-            modal.value = false
-            Swal.fire(
-              'Error',
-              'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
-              'info',
-            )
-          })
+        if (props.role.name == "Administrador") {
+          Swal.fire('', 'No puede cambiar los permisos de un usuario administrador.', 'info')
+        } else {
+          await api.put(`/users/${props.id}/`, { is_active: !props.is_active })
+            .then(result => {
+              modal.value = false
+              Swal.fire('Guardado', 'Actualizado con éxito.', 'success')
+              getData(filter.value)
+            })
+            .catch(e => {
+              modal.value = false
+              Swal.fire(
+                'Error',
+                'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
+                'info',
+              )
+            })
+        }
       }
     }
 

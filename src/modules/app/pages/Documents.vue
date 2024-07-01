@@ -18,7 +18,7 @@
       </template>
       <template v-slot:body="props">
         <q-tr :props="props">
-          <q-td key="id">{{ props.row.id }}</q-td>
+          <!-- <q-td key="id">{{ props.row.id }}</q-td> -->
           <q-td key="nombre">{{ props.row.nombre }}</q-td>
           <q-td key="fecha_creacion">{{ props.row.fecha_creacion }}</q-td>
           <q-td key="nro_paginas">{{ props.row.nro_paginas }}</q-td>
@@ -57,7 +57,7 @@ export default {
 
 
     const columns = [
-      { name: 'id', align: 'left', label: 'ID', field: 'id', sortable: true },
+      // { name: 'id', align: 'left', label: 'ID', field: 'id', sortable: true },
       { name: 'nombre', align: 'left', label: 'NOMBRE', field: 'nombre' },
       { name: 'fecha_creacion', align: 'left', label: 'FECHA CREACIÓN', field: 'fecha_creacion', sortable: true },
       { name: 'nro_paginas', align: 'left', label: 'NÚMERO DE PÁGINAS', field: 'nro_paginas', sortable: true },

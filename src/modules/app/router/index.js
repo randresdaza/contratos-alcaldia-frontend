@@ -42,7 +42,7 @@ export default {
     },
     {
       path: 'contracts/view-docs-contract/:id',
-      name: 'documents',
+      name: 'docs',
       component: () => import('src/modules/app/pages/Documents.vue'),
       props: (route) => {
         return {

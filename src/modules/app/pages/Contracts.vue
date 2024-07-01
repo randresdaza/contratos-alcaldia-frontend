@@ -265,7 +265,7 @@ export default {
     }
 
     const onView = (data) => {
-      router.push({ name: 'documents', params: { id: data.id } })
+      router.push({ name: 'docs', params: { id: data.id } })
     }
 
     const onEdit = (data) => {
@@ -362,8 +362,7 @@ export default {
     const getNDocs = async () => {
       await api.get(`/documentos/contrato/${formData.value.id}/`)
         .then(result => {
-          const data = result.data
-          nDocs.value = data.length
+          nDocs.value = result.data.count
           updateContract()
         })
         .catch(e => {
@@ -446,7 +445,7 @@ export default {
             }
             await api.post('/documentos/', dataToSave)
               .then(result => {
-
+                getNDocs()
               })
               .catch(e => {
                 modalDoc.value = false
@@ -471,7 +470,6 @@ export default {
             exist = true
           }
         }
-        getNDocs()
         $q.loading.hide()
         modalDoc.value = false
         if (exist) {
