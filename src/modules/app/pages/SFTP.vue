@@ -66,8 +66,9 @@ export default {
           data.value = result.data;
           route.value = data.value[0].ruta
         })
-        .catch(e => {
+        .catch(async (e) => {
           if (e.response.status == 401) {
+            await logout()
             Swal.fire(
               {
                 html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
@@ -76,10 +77,8 @@ export default {
             ).then((result) => {
               if (result.isConfirmed) {
                 router.push({ name: 'login' })
-                logout()
               } else {
                 router.push({ name: 'login' })
-                logout()
               }
             })
           }
@@ -114,8 +113,9 @@ export default {
             valid.value = true
           }
         })
-        .catch(e => {
+        .catch(async (e) => {
           if (e.response.status == 401) {
+            await logout()
             Swal.fire(
               {
                 html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
@@ -124,10 +124,8 @@ export default {
             ).then((result) => {
               if (result.isConfirmed) {
                 router.push({ name: 'login' })
-                logout()
               } else {
                 router.push({ name: 'login' })
-                logout()
               }
             })
           }
@@ -146,8 +144,9 @@ export default {
           input.value = true
           field.value = false
         })
-        .catch(e => {
+        .catch(async (e) => {
           if (e.response.status == 401) {
+            await logout()
             Swal.fire(
               {
                 html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
@@ -156,10 +155,8 @@ export default {
             ).then((result) => {
               if (result.isConfirmed) {
                 router.push({ name: 'login' })
-                logout()
               } else {
                 router.push({ name: 'login' })
-                logout()
               }
             })
           }

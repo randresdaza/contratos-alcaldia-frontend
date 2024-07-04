@@ -94,8 +94,9 @@ export default {
             data.value[i].fecha_creacion = dateFormat
           }
         })
-        .catch(e => {
+        .catch(async (e) => {
           if (e.response.status == 401) {
+            await logout()
             Swal.fire(
               {
                 html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',

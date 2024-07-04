@@ -63,8 +63,9 @@ export default {
         .then(result => {
           data.value = result.data;
         })
-        .catch(e => {
+        .catch(async (e) => {
           if (e.response.status == 401) {
+            await logout()
             Swal.fire(
               {
                 html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
@@ -73,10 +74,8 @@ export default {
             ).then((result) => {
               if (result.isConfirmed) {
                 router.push({ name: 'login' })
-                logout()
               } else {
                 router.push({ name: 'login' })
-                logout()
               }
             })
           }
@@ -89,7 +88,7 @@ export default {
           Swal.fire('Guardado', 'Registrado con éxito.', 'success')
           getData()
         })
-        .catch(e => {
+        .catch(async (e) => {
           if (e.response.status == 400) {
             Swal.fire(
               {
@@ -98,6 +97,7 @@ export default {
               }
             )
           } else if (e.response.status == 401) {
+            await logout()
             Swal.fire(
               {
                 html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
@@ -106,10 +106,8 @@ export default {
             ).then((result) => {
               if (result.isConfirmed) {
                 router.push({ name: 'login' })
-                logout()
               } else {
                 router.push({ name: 'login' })
-                logout()
               }
             })
           }
@@ -138,8 +136,9 @@ export default {
               )
               getData()
             })
-            .catch(e => {
+            .catch(async (e) => {
               if (e.response.status == 401) {
+                await logout()
                 Swal.fire(
                   {
                     html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
@@ -148,10 +147,8 @@ export default {
                 ).then((result) => {
                   if (result.isConfirmed) {
                     router.push({ name: 'login' })
-                    logout()
                   } else {
                     router.push({ name: 'login' })
-                    logout()
                   }
                 })
               } else if (e.response.status == 500) {

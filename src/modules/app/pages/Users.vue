@@ -153,20 +153,19 @@ export default {
           data.value = result.data.results;
           pagination.value.rowsNumber = result.data.count;
         })
-        .catch(e => {
+        .catch(async (e) => {
           if (e.response.status == 401) {
+            await logout()
             Swal.fire(
               {
                 html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
                 icon: 'info'
               }
-            ).then((result) => {
+            ).then(async (result) => {
               if (result.isConfirmed) {
                 router.push({ name: 'login' })
-                logout()
               } else {
                 router.push({ name: 'login' })
-                logout()
               }
             })
           }
@@ -178,8 +177,9 @@ export default {
         .then(result => {
           roles.value = result.data
         })
-        .catch(e => {
+        .catch(async (e) => {
           if (e.response.status == 401) {
+            await logout()
             Swal.fire(
               {
                 html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
@@ -188,10 +188,8 @@ export default {
             ).then((result) => {
               if (result.isConfirmed) {
                 router.push({ name: 'login' })
-                logout()
               } else {
                 router.push({ name: 'login' })
-                logout()
               }
             })
           }
@@ -256,7 +254,7 @@ export default {
           Swal.fire('Guardado', 'Actualizado con éxito.', 'success')
           getData(filter.value)
         })
-        .catch(e => {
+        .catch(async (e) => {
           const message = JSON.parse(e.request.responseText)
           if (message.username) {
             Swal.fire({
@@ -275,6 +273,7 @@ export default {
             })
           }
           if (e.response.status == 401) {
+            await logout()
             Swal.fire(
               {
                 html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
@@ -284,10 +283,8 @@ export default {
             ).then((result) => {
               if (result.isConfirmed) {
                 router.push({ name: 'login' })
-                logout()
               } else {
                 router.push({ name: 'login' })
-                logout()
               }
             })
           }
@@ -425,8 +422,9 @@ export default {
                 'success'
               )
             })
-            .catch(e => {
+            .catch(async (e) => {
               if (e.response.status == 401) {
+                await logout()
                 Swal.fire(
                   {
                     html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
@@ -435,10 +433,8 @@ export default {
                 ).then((result) => {
                   if (result.isConfirmed) {
                     router.push({ name: 'login' })
-                    logout()
                   } else {
                     router.push({ name: 'login' })
-                    logout()
                   }
                 })
               } else if (e.response.status == 500) {

@@ -240,8 +240,9 @@ export default {
           data.value = result.data.results;
           pagination.value.rowsNumber = result.data.count;
         })
-        .catch(e => {
+        .catch(async (e) => {
           if (e.response.status == 401) {
+            await logout()
             Swal.fire(
               {
                 html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
@@ -250,10 +251,8 @@ export default {
             ).then((result) => {
               if (result.isConfirmed) {
                 router.push({ name: 'login' })
-                logout()
               } else {
                 router.push({ name: 'login' })
-                logout()
               }
             })
           }
@@ -294,8 +293,9 @@ export default {
               )
               getDataByDate(filter.value)
             })
-            .catch(e => {
+            .catch(async (e) => {
               if (e.response.status == 401) {
+                await logout()
                 Swal.fire(
                   {
                     html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
@@ -304,10 +304,8 @@ export default {
                 ).then((result) => {
                   if (result.isConfirmed) {
                     router.push({ name: 'login' })
-                    logout()
                   } else {
                     router.push({ name: 'login' })
-                    logout()
                   }
                 })
               } else if (e.response.status == 500) {
@@ -365,8 +363,9 @@ export default {
           nDocs.value = result.data.count
           updateContract()
         })
-        .catch(e => {
+        .catch(async (e) => {
           if (e.response.status == 401) {
+            await logout()
             Swal.fire(
               {
                 html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
@@ -375,10 +374,8 @@ export default {
             ).then((result) => {
               if (result.isConfirmed) {
                 router.push({ name: 'login' })
-                logout()
               } else {
                 router.push({ name: 'login' })
-                logout()
               }
             })
           }
@@ -417,7 +414,6 @@ export default {
           spinnerColor: 'primary'
         })
         const resp = await uploadFile(file.value)
-        console.log('respuesta', resp);
         for (let i = 0; i < resp.length; i++) {
           let day = date.getDate()
           let month = date.getMonth() + 1
@@ -434,7 +430,6 @@ export default {
           if (!resp[i].existing) {
             let name = file.value[i].name
             let nameToSave = name.split('.').slice(0, -1).join('.')
-            console.log('NOMBRE:', nameToSave);
             // let name = file.value[i].name.split('.')[0]
             let dataToSave = {
               nombre: nameToSave,
@@ -447,9 +442,10 @@ export default {
               .then(result => {
                 getNDocs()
               })
-              .catch(e => {
+              .catch(async (e) => {
                 modalDoc.value = false
                 if (e.response.status == 401) {
+                  await logout()
                   Swal.fire(
                     {
                       html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
@@ -458,10 +454,8 @@ export default {
                   ).then((result) => {
                     if (result.isConfirmed) {
                       router.push({ name: 'login' })
-                      logout()
                     } else {
                       router.push({ name: 'login' })
-                      logout()
                     }
                   })
                 }
@@ -482,7 +476,6 @@ export default {
         }
       } catch (error) {
         $q.loading.hide()
-        console.log('error catch', error);
       }
     }
 

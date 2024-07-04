@@ -209,8 +209,9 @@ export default {
           const name = result.data.nombre
           pdfName.value = name.split('.')[0]
         })
-        .catch(e => {
+        .catch(async (e) => {
           if (e.response.status == 401) {
+            await logout()
             Swal.fire(
               {
                 html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',

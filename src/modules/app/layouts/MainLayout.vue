@@ -56,6 +56,7 @@ import { linksListSup } from 'src/modules/app/router/link-list-sup';
 import { useRouter } from 'vue-router';
 import useAuth from 'src/modules/auth/composables/useAuth';
 import useUI from 'src/modules/app/composables/useUI';
+import Swal from 'sweetalert2';
 
 
 export default defineComponent({
@@ -89,9 +90,15 @@ export default defineComponent({
       currentUser,
       selectedMenuItem,
 
-      onLogout: () => {
+      onLogout: async () => {
+        const { ok, message } = await logout()
+        if (!ok) {
+          Swal.fire('', message, 'info')
+        }
+        else {
+          Swal.fire('Exito', message, 'success')
+        }
         router.push({ name: 'login' })
-        logout()
       }
     }
   }

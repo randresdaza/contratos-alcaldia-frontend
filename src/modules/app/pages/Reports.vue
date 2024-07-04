@@ -106,8 +106,9 @@ export default defineComponent({
         .then(result => {
           data.value = result.data;
         })
-        .catch(e => {
+        .catch(async (e) => {
           if (e.response.status == 401) {
+            await logout()
             Swal.fire(
               {
                 html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
@@ -213,8 +214,9 @@ export default defineComponent({
               })
             }
           })
-          .catch(e => {
+          .catch(async (e) => {
             if (e.response.status == 401) {
+              await logout()
               Swal.fire(
                 {
                   html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
@@ -317,8 +319,9 @@ export default defineComponent({
               })
             }
           })
-          .catch(e => {
+          .catch(async (e) => {
             if (e.response.status == 401) {
+              await logout()
               Swal.fire(
                 {
                   html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',

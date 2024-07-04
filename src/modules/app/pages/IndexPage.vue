@@ -16,25 +16,25 @@ export default defineComponent({
   setup() {
     const { logout, checkAuthStatus } = useAuth()
     const router = useRouter()
-    const resp = checkAuthStatus()
+    // const resp = checkAuthStatus()
 
-    resp.then((resp) => {
-      if (resp.ok === false) {
-        Swal.fire(
-          'Error',
-          'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
-          'info',
-        ).then((result) => {
-          if (result.isConfirmed) {
-            router.push({ name: 'login' })
-            logout()
-          } else {
-            router.push({ name: 'login' })
-            logout()
-          }
-        })
-      }
-    })
+    // resp.then((resp) => {
+    //   if (resp.ok === false) {
+    //     Swal.fire(
+    //       'Error',
+    //       'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
+    //       'info',
+    //     ).then((result) => {
+    //       if (result.isConfirmed) {
+    //         router.push({ name: 'login' })
+    //         logout()
+    //       } else {
+    //         router.push({ name: 'login' })
+    //         logout()
+    //       }
+    //     })
+    //   }
+    // })
   }
 })
 </script>

@@ -15,8 +15,8 @@ import useAuth from './modules/auth/composables/useAuth';
 export default defineComponent({
   name: 'App',
   setup() {
-    const { authStatus, checkAuthStatus } = useAuth()
-    checkAuthStatus()
+    const { authStatus, checkAuth } = useAuth()
+    checkAuth()
     return {
       authStatus
     }

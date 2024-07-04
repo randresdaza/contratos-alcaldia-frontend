@@ -122,8 +122,9 @@ export default {
               data.value[i].fecha = dateFormat;
             }
           })
-          .catch(e => {
+          .catch(async (e) => {
             if (e.response.status == 401) {
+              await logout()
               Swal.fire(
                 {
                   html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
@@ -132,10 +133,8 @@ export default {
               ).then((result) => {
                 if (result.isConfirmed) {
                   router.push({ name: 'login' })
-                  logout()
                 } else {
                   router.push({ name: 'login' })
-                  logout()
                 }
               })
             }
@@ -159,8 +158,9 @@ export default {
               data.value[i].fecha = dateFormat;
             }
           })
-          .catch(e => {
+          .catch(async (e) => {
             if (e.response.status == 401) {
+              await logout()
               Swal.fire(
                 {
                   html: 'Su sesión ha expirado.<br>Vuelva a iniciar sesión.',
@@ -169,10 +169,8 @@ export default {
               ).then((result) => {
                 if (result.isConfirmed) {
                   router.push({ name: 'login' })
-                  logout()
                 } else {
                   router.push({ name: 'login' })
-                  logout()
                 }
               })
             }
