@@ -8,7 +8,7 @@ import Cookies from 'js-cookie'
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-const api = axios.create({ baseURL: 'http://190.144.160.138:8000' })
+const api = axios.create({ baseURL: 'http://190.144.160.138:8090' })
 
 api.interceptors.request.use((config) => {
 
@@ -21,7 +21,7 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-const noAuthApi = axios.create({ baseURL: 'http://190.144.160.138:8000' })
+const noAuthApi = axios.create({ baseURL: 'http://190.144.160.138:8090' })
 
 
 export default boot(({ app }) => {
